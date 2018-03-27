@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/evert/structured-header/issues"
   },
-  "homepage": "https://github.com/evert/structured-header#readme"
+  "homepage": "https://github.com/evert/structured-header#readme",
+  "dependencies": {
+    "mocha": "^5.0.5"
+  }
 }
