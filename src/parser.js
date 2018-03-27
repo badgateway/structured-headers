@@ -30,7 +30,7 @@ Parser.prototype.parseDictionary = function() {
 
     // Optional whitespace
     this.skipOWS();
-   
+
     // Exit if at end of string
     if (this.eol()) {
       return output;
@@ -48,18 +48,92 @@ Parser.prototype.parseDictionary = function() {
 
   }
 
-  return output;
+};
+
+Parser.prototype.parseList = function() {
+
+  var output = [];
+
+  while(!this.eol()) {
+
+    // Get item
+    var value = this.parseItem();
+    output.push(value);
+
+    // Whitespace
+    this.skipOWS();
+
+    if (this.eol()) {
+      return output;
+    }
+
+    // Grab a comma
+    this.matchByte(',');
+
+    // Whitespace
+    this.skipOWS();
+
+  }
+  throw new Error('Unexpected end of string');
 
 };
 
-Parser.prototype.parseIdentifier = function() {
+Parser.prototype.parseParameterizedList = function() {
 
-  var result = this.input.substr(this.position).match(identifierRegex);
-  if (!result) {
-    throw Error('Expected identifier at position: ' + this.position);
+  var output = [];
+  while(!this.eol()) {
+
+    // Parse item
+    output.push(this.parseParameterizedIdentifier());
+
+    // Whitespace
+    this.skipOWS();
+
+    if (this.eol()) {
+      return output;
+    }
+
+    this.matchByte(',');
+    this.skipOWS();
+
   }
-  this.position += result[0].length;
-  return result[0];
+  throw new Error('Unexpected end of string');
+
+};
+
+Parser.prototype.parseParameterizedIdentifier = function() {
+
+  var identifier = this.parseIdentifier();
+  var parameters = {};
+
+  while(true) {
+
+    // Whitespace
+    this.skipOWS();
+
+    // Stop if parameter didn't start with ;
+    if (this.input[this.position]!==';') {
+      break;
+    }
+    this.position++;
+
+    // Whitespace
+    this.skipOWS();
+
+    var paramName = this.parseIdentifier();
+    var paramValue = null;
+
+    // If there's an =, there's a value
+    if (this.input[this.position] === '=') {
+      this.position++;
+      paramValue = this.parseItem();
+    }
+
+    parameters[paramName] = paramValue;
+
+  }
+
+  return [identifier, parameters];
 
 };
 
@@ -82,13 +156,13 @@ Parser.prototype.parseItem = function() {
 
   throw new Error('Unexpected character: ' + c + ' on position ' + this.position);
 
-}
+};
 
 Parser.prototype.parseNumber = function() {
 
   var match = this.input.substr(
     this.position
-  ).match(/[0-9\-][0-9\.]+/);
+  ).match(/[0-9\-][0-9\.]*/);
   if (!match) {
     throw Error('Could not parse number at position: ' + this.position);
   }
@@ -99,7 +173,7 @@ Parser.prototype.parseNumber = function() {
     return parseInt(match[0],10);
   }
 
-}
+};
 
 Parser.prototype.parseString = function() {
 
@@ -112,7 +186,7 @@ Parser.prototype.parseString = function() {
 
     var c = this.getByte();
     switch (c) {
-        
+
       case '\\' :
         var c2 = this.getByte();
         if (c2 !== '"' && c2 !== '\\') {
@@ -129,7 +203,18 @@ Parser.prototype.parseString = function() {
 
   }
 
-}
+};
+
+Parser.prototype.parseIdentifier = function() {
+
+  var result = this.input.substr(this.position).match(identifierRegex);
+  if (!result) {
+    throw Error('Expected identifier at position: ' + this.position);
+  }
+  this.position += result[0].length;
+  return result[0];
+
+};
 
 Parser.prototype.parseBinary = function() {
 
@@ -138,12 +223,12 @@ Parser.prototype.parseBinary = function() {
   if (!result) {
     throw new Error('Couldn\'t parse binary item');
   }
- 
+
   this.position += result[0].length;
 
   return Buffer.from(result[1], 'base64');
 
-}
+};
 
 // Advances the pointer to skip all whitespace.
 Parser.prototype.skipOWS = function() {
@@ -157,7 +242,7 @@ Parser.prototype.skipOWS = function() {
     }
   }
 
-}
+};
 
 // Advances the pointer 1 position and returns a byte.
 Parser.prototype.getByte = function() {
@@ -169,7 +254,7 @@ Parser.prototype.getByte = function() {
   this.position++;
   return c;
 
-}
+};
 
 // Grabs 1 byte from the stream and makes sure it matches the specified
 // character.
@@ -180,13 +265,13 @@ Parser.prototype.matchByte = function(match) {
     throw new Error('Expected ' + match + ' on position ' + (this.position-1));
   }
 
-}
+};
 
 // Returns true if we're at the end of the line.
 Parser.prototype.eol = function() {
 
   return this.position === this.input.length;
 
-}
+};
 
 module.exports = Parser;

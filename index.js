@@ -7,6 +7,20 @@ module.exports = {
     var parser = new Parser(input);
     return parser.parseDictionary();
 
+  },
+
+  parseList: function(input) {
+
+    var parser = new Parser(input);
+    return parser.parseList();
+
+  },
+
+  parseParameterizedList: function(input) {
+
+    var parser = new Parser(input);
+    return parser.parseParameterizedList();
+
   }
 
 };
