@@ -4,7 +4,9 @@
   "description": "Implementation of draft-ietf-httpbis-header-structure, structured headers for HTTP.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "eslint lib/ && nyc mocha",
+    "prepare": "make build",
+    "build": "make build"
   },
   "repository": {
     "type": "git",
@@ -22,6 +24,8 @@
   "homepage": "https://github.com/evert/structured-header#readme",
   "devDependencies": {
     "chai": "^4.1.2",
-    "mocha": "^5.0.5"
+    "mocha": "^5.0.5",
+    "webpack": "^4.2.0",
+    "webpack-cli": "^2.0.13"
   }
 }

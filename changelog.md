@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+0.0.2 (2018-03-27)
+------------------
+
+* Added minified webpacked version.
+* Added readme.
+
+
 0.0.1 (2018-03-26)
 ------------------
 

@@ -44,4 +44,12 @@ header.parseParameterizedList('abc_123;a=1;b=2; c, def_456, ghi;q="19";r=foo');
 
 ```
 
+Browser support
+---------------
+
+There is a minified version of this library in the `dist/` directory. This minified
+file will expose a global variable called 'structuredHeader' which contains the rest
+of the api.
+
+
 [1]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure
