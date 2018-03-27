@@ -5,12 +5,12 @@ var Parser = function(input) {
 
   this.input = input;
   this.position = 0;
+  this.skipOWS();
 
 };
 
 Parser.prototype.parseDictionary = function() {
 
-  this.skipOWS();
   var output = {};
 
   while(true) {
