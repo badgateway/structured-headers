@@ -1,6 +1,3 @@
-// Regular experession for an identifier
-var identifierRegex = /[a-z][a-z0-9_\-\*\/]{0,254}/
-
 var Parser = function(input) {
 
   this.input = input;
@@ -163,9 +160,6 @@ Parser.prototype.parseNumber = function() {
   var match = this.input.substr(
     this.position
   ).match(/[0-9\-][0-9\.]*/);
-  if (!match) {
-    throw Error('Could not parse number at position: ' + this.position);
-  }
   this.position += match[0].length;
   if (match[0].indexOf('.') !== -1) {
     return parseFloat(match[0]);
@@ -178,9 +172,6 @@ Parser.prototype.parseNumber = function() {
 Parser.prototype.parseString = function() {
 
   var output = '';
-  if (this.input[this.position] !== '"') {
-    throw new Error('Expected " on position: ' + this.position);
-  }
   this.position++;
   while(true) {
 
@@ -207,6 +198,7 @@ Parser.prototype.parseString = function() {
 
 Parser.prototype.parseIdentifier = function() {
 
+  var identifierRegex = /^[a-z][a-z0-9_\-\*\/]{0,254}/
   var result = this.input.substr(this.position).match(identifierRegex);
   if (!result) {
     throw Error('Expected identifier at position: ' + this.position);

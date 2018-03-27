@@ -6,7 +6,8 @@ ChangeLog
 
 * Added minified webpacked version.
 * Added readme.
-
+* Fixed a small bug in identifier parsing.
+* 100% unittest coverage.
 
 0.0.1 (2018-03-26)
 ------------------
