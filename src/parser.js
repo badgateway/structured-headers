@@ -211,11 +211,14 @@ Parser.prototype.parseIdentifier = function() {
 Parser.prototype.parseBinary = function() {
 
   this.matchByte('*');
-  var result = this.input.substr(this.position).match(/^(.*)\*/);
+  var result = this.input.substr(this.position).match(/^([A-Za-z0-9\\+\\/=]*)\*/);
   if (!result) {
     throw new Error('Couldn\'t parse binary item');
   }
-
+  debugger;
+  if (result[1].length % 4 !== 0) {
+    throw new Error('Base64 strings should always have a length that\'s a multiple of 4. Did you forget padding?');
+  }
   this.position += result[0].length;
 
   return Buffer.from(result[1], 'base64');

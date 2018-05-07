@@ -6,7 +6,7 @@ clean:
 	rm dist/ketting.js
 
 .PHONY: test
-test:
+test: test/httpwg-tests/list.json
 	npm test
 
 .PHONY: lint
@@ -21,3 +21,5 @@ dist/structured-header.min.js: src/*.js index.js
 		--display-modules \
 		--sort-modules-by size
 
+test/httpwg-tests/list.json:
+	git clone https://github.com/httpwg/structured-header-tests test/httpwg-tests

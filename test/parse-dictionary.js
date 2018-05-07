@@ -5,7 +5,7 @@ describe("Dictionaries", () => {
 
   it('should parse dictionaries', () => {
 
-    var input = 'foo=1.23, en="Applepie", da=*w4ZibGV0w6ZydGUK*';
+    var input = 'foo=1.23, en="Applepie", da=*w4ZibGV0w6ZydGUK==*';
     var output = parse(input);
 
     var expected = {

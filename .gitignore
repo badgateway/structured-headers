@@ -4,8 +4,9 @@
 # npm
 /node_modules
 
-# nyc
+# Tests
 /.nyc_output
+/test/httpwg-tests
 
 # build
 /dist
