@@ -9,35 +9,34 @@ function addTest(test) {
 
   const parser = new Parser(test.raw.join(','));
 
-    it(test.name, () => {
-      let hadError = false;
-      let result;
-      try {
-        switch(test.header_type) {
-          case 'item' :
-            result = parser.parseItem();
-            break;
-          case 'list' :
-            result = parser.parseList();
-            break;
-        }
-      } catch (e) {
-        hadError = true;
-        //console.log(e);
+  it(test.name, () => {
+    let hadError = false;
+    let result;
+    try {
+      switch(test.header_type) {
+        case 'item' :
+          result = parser.parseItem();
+          break;
+        case 'list' :
+          result = parser.parseList();
+          break;
       }
+    } catch (e) {
+      hadError = true;
+      //console.log(e);
+    }
 
-      if (test.expected === false) {
-        expect(hadError).to.equal(true);
-      } else {
-        expect(hadError).to.equal(false);
+    if (test.expected === false) {
+      expect(hadError).to.equal(true);
+    } else {
+      expect(hadError).to.equal(false);
 
-        if(result instanceof Buffer) {
-          result = result.toString('utf-8');
-        }
-        expect(result).to.deep.equal(test.expected);
+      if(result instanceof Buffer) {
+        result = result.toString('utf-8');
       }
-    });
-  }
+      expect(result).to.deep.equal(test.expected);
+    }
+  });
 
 }
 
