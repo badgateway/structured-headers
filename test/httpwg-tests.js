@@ -4,6 +4,7 @@ const binaryTests = require('./httpwg-tests/binary.json');
 const listTests = require('./httpwg-tests/list.json');
 const numberTests = require('./httpwg-tests/list.json');
 const stringTests = require('./httpwg-tests/string.json');
+const base32Encode = require('base32-encode');
 
 function addTest(test) {
 
@@ -32,7 +33,7 @@ function addTest(test) {
       expect(hadError).to.equal(false);
 
       if(result instanceof Buffer) {
-        result = result.toString('utf-8');
+        result = base32Encode(result, 'RFC4648');
       }
       expect(result).to.deep.equal(test.expected);
     }
