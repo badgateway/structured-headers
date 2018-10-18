@@ -147,7 +147,7 @@ Parser.prototype.parseItem = function() {
   if (c.match(/[0-9\-]/)) {
     return this.parseNumber();
   }
-  if (c.match(/[a-z]/)) {
+  if (c.match(/[a-z]/i)) {
     return this.parseIdentifier();
   }
 
@@ -198,7 +198,7 @@ Parser.prototype.parseString = function() {
 
 Parser.prototype.parseIdentifier = function() {
 
-  var identifierRegex = /^[a-z][a-z0-9_\-\*\/]{0,254}/
+  var identifierRegex = /^[a-z][a-z0-9_\-\*\/]{0,254}/i;
   var result = this.input.substr(this.position).match(identifierRegex);
   if (!result) {
     throw Error('Expected identifier at position: ' + this.position);
