@@ -1,7 +1,7 @@
 export PATH:=./node_modules/.bin/:$(PATH)
 
 .PHONY: build
-build: browser/structured-headers.min.js tsbuild
+build: browser/structured-header.min.js tsbuild
 
 .PHONY: clean
 clean:

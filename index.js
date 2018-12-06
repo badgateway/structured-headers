@@ -21,6 +21,13 @@ module.exports = {
     var parser = new Parser(input);
     return parser.parseParameterizedList();
 
+  },
+
+  parseItem: function(input) {
+
+    var parser = new Parser(input);
+    return parser.parseItem();
+
   }
 
 };
