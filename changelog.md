@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+0.1.0 (????-??-??)
+------------------
+
+* Package renamed to 'structured-headers'.
+* Conversion to typescript.
+
+
 0.0.2 (2018-03-27)
 ------------------
 

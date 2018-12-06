@@ -1,6 +1,6 @@
 {
-  "name": "structured-header",
-  "version": "0.0.2",
+  "name": "structured-headers",
+  "version": "0.1.0",
   "description": "Implementation of draft-ietf-httpbis-header-structure, structured headers for HTTP.",
   "main": "index.js",
   "scripts": {
