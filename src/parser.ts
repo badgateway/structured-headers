@@ -94,7 +94,7 @@ class Parser {
 
   parseListList(): ListList {
 
-    const output:ListList = [[]];
+    const output: ListList = [[]];
 
     while (!this.eol()) {
 
@@ -111,7 +111,7 @@ class Parser {
 
       const separator = this.getByte();
 
-      switch(separator) {
+      switch (separator) {
         case ',' :
           // Next inner list
           output.push([]);
