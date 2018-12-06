@@ -39,7 +39,7 @@ class Parser {
       this.matchByte('=');
 
       // Value
-      const value = this.parseToken();
+      const value = this.parseItem();
       output[key] = value;
 
       // Optional whitespace
