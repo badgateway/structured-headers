@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const Parser = require('../src/parser');
+const Parser = require('../dist/parser');
 const binaryTests = require('./httpwg-tests/binary.json');
 const listTests = require('./httpwg-tests/list.json');
 const numberTests = require('./httpwg-tests/list.json');

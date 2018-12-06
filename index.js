@@ -1,4 +1,4 @@
-var Parser = require('./src/parser');
+var Parser = require('./dist/parser');
 
 module.exports = {
 

@@ -1,25 +1,47 @@
+export PATH:=./node_modules/.bin/:$(PATH)
+
 .PHONY: build
-build: dist/structured-header.min.js
+build: browser/structured-headers.min.js tsbuild
 
 .PHONY: clean
 clean:
-	rm dist/ketting.js
+	rm -r browser/
+	rm -r dist/
 
 .PHONY: test
-test: test/httpwg-tests/list.json
-	npm test
+test: lint test/httpwg-tests/list.json
+	nyc mocha
+
+.PHONY: test-debug
+test-debug:
+	mocha --inspect-brk
 
 .PHONY: lint
 lint:
-	node_modules/.bin/eslint lib/
+	tslint -c tslint.json --project tsconfig.json 'src/**/*.ts' 'test/**/*.ts'
 
-dist/structured-header.min.js: src/*.js index.js
-	mkdir -p dist
-	node_modules/.bin/webpack \
+.PHONY: fix
+fix:
+	tslint -c tslint.json --project tsconfig.json 'src/**/*.ts' 'test/**/*.ts' --fix
+
+.PHONY: tsbuild
+tsbuild:
+	tsc
+
+.PHONY: watch
+watch:
+	tsc --watch
+
+.PHONY: browserbuild
+browserbuild:
+	mkdir -p browser
+	webpack \
 		--optimize-minimize \
 		-p \
 		--display-modules \
 		--sort-modules-by size
+
+browser/structured-header.min.js: browserbuild
 
 test/httpwg-tests/list.json:
 	git clone https://github.com/httpwg/structured-header-tests test/httpwg-tests
