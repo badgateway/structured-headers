@@ -12,7 +12,7 @@ ChangeLog
 * Support for Booleans.
 * The `parseIdentifier` function is renamed to `parseToken`, to match the
   rename in draft-ietf-httpbis-header-structure-09.
-
+* Renamed `parseParameterizedList` to `parseParamList`. It's shorter.
 
 0.0.2 (2018-03-27)
 ------------------

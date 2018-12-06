@@ -114,7 +114,7 @@ Parsing:
 
 ```javascript
 const sh = require('structured-headers');
-console.log(sh.parseParameterizedList(header));
+console.log(sh.parseParamList(header));
 ```
 
 This will result in `[['foo', { param1: "value1" }], ['bar', { param2: "value2" }]`.

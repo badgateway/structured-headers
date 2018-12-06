@@ -23,10 +23,10 @@ module.exports = {
 
   },
 
-  parseParameterizedList: function(input) {
+  parseParamList: function(input) {
 
     var parser = new Parser(input);
-    return parser.parseParameterizedList();
+    return parser.parseParamList();
 
   },
 

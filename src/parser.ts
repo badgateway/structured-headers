@@ -30,7 +30,7 @@ class Parser {
     while (true) {
 
       // Dictionary key
-      const key = this.parseToken();
+      const key = this.parseKey();
       if (output[key] !== undefined) {
         throw new Error('Duplicate key in dictionary: ' + key);
       }
@@ -39,7 +39,7 @@ class Parser {
       this.matchByte('=');
 
       // Value
-      const value = this.parseItem();
+      const value = this.parseItemStr();
       output[key] = value;
 
       // Optional whitespace
@@ -71,7 +71,7 @@ class Parser {
     while (!this.eol()) {
 
       // Get item
-      const value = this.parseItem();
+      const value = this.parseItemStr();
       output.push(value);
 
       // Whitespace
@@ -99,7 +99,7 @@ class Parser {
     while (!this.eol()) {
 
       // Get item
-      const value = this.parseItem();
+      const value = this.parseItemStr();
       output[output.length - 1].push(value);
 
       // Whitespace
@@ -131,13 +131,13 @@ class Parser {
 
   }
 
-  parseParameterizedList(): ParameterizedList {
+  parseParamList(): ParameterizedList {
 
     const output = [];
     while (!this.eol()) {
 
       // Parse item
-      output.push(this.parseParameterizedIdentifier());
+      output.push(this.parseParamListItem());
 
       // Whitespace
       this.skipOWS();
@@ -154,7 +154,7 @@ class Parser {
 
   }
 
-  parseParameterizedIdentifier(): ParameterizedIdentifier {
+  parseParamListItem(): ParameterizedIdentifier {
 
     const identifier = this.parseToken();
     const parameters: Dictionary = {};
@@ -173,13 +173,17 @@ class Parser {
       // Whitespace
       this.skipOWS();
 
-      const paramName = this.parseToken();
+      const paramName = this.parseKey();
+
+      if (paramName in parameters) {
+        throw new Error('Duplicate parameter in parameterized list: ' + paramName);
+      }
       let paramValue = null;
 
       // If there's an =, there's a value
       if (this.input[this.position] === '=') {
         this.position++;
-        paramValue = this.parseItem();
+        paramValue = this.parseItemStr();
       }
 
       parameters[paramName] = paramValue;
@@ -190,9 +194,29 @@ class Parser {
 
   }
 
+  /**
+   * Parses a header as "item".
+   */
   parseItem(): Item {
 
     this.skipOWS();
+    const r = this.parseItemStr();
+    this.end();
+    return r;
+
+  }
+
+  /**
+   * Parses an "item" part from a header.
+   *
+   * This function is used for parsing items that are a component of other
+   * headers.
+   *
+   * If you are parsing an entire header, which should only contain a single
+   * item, use parseItem() instead.
+   */
+  parseItemStr(): Item {
+
     const c = this.input[this.position];
     if (c === '"') {
       return this.parseString();
@@ -206,7 +230,7 @@ class Parser {
     if (c.match(/[0-9\-]/)) {
       return this.parseNumber();
     }
-    if (c.match(/[a-z]/)) {
+    if (c.match(/[a-zA-Z]/)) {
       return this.parseToken();
     }
 
@@ -214,11 +238,12 @@ class Parser {
 
   }
 
+
   parseNumber(): number {
 
     const match = this.input.substr(
       this.position
-    ).match(/[0-9\-][0-9\.]*/);
+    ).match(/[0-9\-]([0-9])*(\.[0-9]+)?/);
     this.position += match[0].length;
     if (match[0].indexOf('.') !== -1) {
       return parseFloat(match[0]);
@@ -247,6 +272,9 @@ class Parser {
         case '"' :
           return output;
         default :
+          if (c < ' ' || c > '~') {
+            throw new Error('Character outside of ASCII range');
+          }
           output += c;
           break;
       }
@@ -255,9 +283,31 @@ class Parser {
 
   }
 
+  /**
+   * Tokens are parsed as strings.
+   *
+   * They are a possible 'item'. If the string contains characters outside
+   * the token list, it should be enclosed in double-quotes and serialized
+   * as a 'string' instead of 'token'
+   */
   parseToken(): string {
 
-    const identifierRegex = /^[a-zA-Z][a-zA-Z0-9_\-\.\:\%\*\/]{0,254}/;
+    const identifierRegex = /^[a-zA-Z][a-zA-Z0-9_\-\.\:\%\*\/]*/;
+    const result = this.input.substr(this.position).match(identifierRegex);
+    if (!result) {
+      throw Error('Expected identifier at position: ' + this.position);
+    }
+    this.position += result[0].length;
+    return result[0];
+
+  }
+
+  /**
+   * Keys are used both in Dictionary and ParamList.
+   */
+  parseKey(): string {
+
+    const identifierRegex = /^[a-z][a-z0-9_\-]{0,254}/;
     const result = this.input.substr(this.position).match(identifierRegex);
     if (!result) {
       throw Error('Expected identifier at position: ' + this.position);
@@ -287,14 +337,19 @@ class Parser {
 
     this.matchByte('?');
     const c = this.getByte();
+    let result;
     switch (c) {
       case 'T' :
-        return true;
+        result = true;
+        break;
       case 'F' :
-        return false;
+        result = false;
+        break;
       default:
         throw new Error('A "?" must be followed by "T" or "F"');
     }
+
+    return result;
 
   }
 
@@ -308,6 +363,17 @@ class Parser {
       } else {
         break;
       }
+    }
+
+  }
+
+  // Eats up any whitespace and ensures that there's nothing left at the end
+  // of the string.
+  end(): void {
+
+    this.skipOWS();
+    if (!this.eol()) {
+      throw new Error('Expected end of the string, but found more data instead');
     }
 
   }
