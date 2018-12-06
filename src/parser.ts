@@ -2,7 +2,7 @@ type Item = string | number | Buffer;
 
 type Dictionary = {
   [s: string]: Item
-}
+};
 
 type List = Item[];
 
@@ -25,9 +25,9 @@ class Parser {
 
   parseDictionary(): Dictionary {
 
-    const output:Dictionary = {};
+    const output: Dictionary = {};
 
-    while(true) {
+    while (true) {
 
       // Dictionary key
       const key = this.parseIdentifier();
@@ -68,7 +68,7 @@ class Parser {
 
     const output = [];
 
-    while(!this.eol()) {
+    while (!this.eol()) {
 
       // Get item
       const value = this.parseItem();
@@ -96,7 +96,7 @@ class Parser {
   parseParameterizedList(): ParameterizedList {
 
     const output = [];
-    while(!this.eol()) {
+    while (!this.eol()) {
 
       // Parse item
       output.push(this.parseParameterizedIdentifier());
@@ -119,15 +119,15 @@ class Parser {
   parseParameterizedIdentifier(): ParameterizedIdentifier {
 
     const identifier = this.parseIdentifier();
-    const parameters:Dictionary = {};
+    const parameters: Dictionary = {};
 
-    while(true) {
+    while (true) {
 
       // Whitespace
       this.skipOWS();
 
       // Stop if parameter didn't start with ;
-      if (this.input[this.position]!==';') {
+      if (this.input[this.position] !== ';') {
         break;
       }
       this.position++;
@@ -182,7 +182,7 @@ class Parser {
     if (match[0].indexOf('.') !== -1) {
       return parseFloat(match[0]);
     } else {
-      return parseInt(match[0],10);
+      return parseInt(match[0], 10);
     }
 
   }
@@ -191,7 +191,7 @@ class Parser {
 
     let output = '';
     this.position++;
-    while(true) {
+    while (true) {
 
       const c = this.getByte();
       switch (c) {
@@ -199,7 +199,7 @@ class Parser {
         case '\\' :
           const c2 = this.getByte();
           if (c2 !== '"' && c2 !== '\\') {
-            throw new Error('Expected a " or \\ on position: ' + (this.position-1));
+            throw new Error('Expected a " or \\ on position: ' + (this.position - 1));
           }
           output += c2;
           break;
@@ -209,14 +209,14 @@ class Parser {
           output += c;
           break;
       }
-    
+
     }
 
   }
 
   parseIdentifier(): string {
 
-    const identifierRegex = /^[a-z][a-z0-9_\-\*\/]{0,254}/
+    const identifierRegex = /^[a-z][a-z0-9_\-\*\/]{0,254}/;
     const result = this.input.substr(this.position).match(identifierRegex);
     if (!result) {
       throw Error('Expected identifier at position: ' + this.position);
@@ -233,7 +233,6 @@ class Parser {
     if (!result) {
       throw new Error('Couldn\'t parse binary item');
     }
-    debugger;
     if (result[1].length % 4 !== 0) {
       throw new Error('Base64 strings should always have a length that\'s a multiple of 4. Did you forget padding?');
     }
@@ -248,7 +247,7 @@ class Parser {
 
     while (true) {
       const c = this.input.substr(this.position, 1);
-      if (c === ' ' || c === "\t") {
+      if (c === ' ' || c === '\t') {
         this.position++;
       } else {
         break;
@@ -275,7 +274,7 @@ class Parser {
 
     const c = this.getByte();
     if (c !== match) {
-      throw new Error('Expected ' + match + ' on position ' + (this.position-1));
+      throw new Error('Expected ' + match + ' on position ' + (this.position - 1));
     }
 
   }
