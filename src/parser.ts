@@ -257,7 +257,7 @@ class Parser {
 
   parseToken(): string {
 
-    const identifierRegex = /^[a-z][a-z0-9_\-\*\/]{0,254}/;
+    const identifierRegex = /^[a-zA-Z][a-zA-Z0-9_\-\.\:\%\*\/]{0,254}/;
     const result = this.input.substr(this.position).match(identifierRegex);
     if (!result) {
       throw Error('Expected identifier at position: ' + this.position);
