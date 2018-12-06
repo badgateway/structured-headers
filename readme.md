@@ -34,8 +34,8 @@ Header: -10
 Header: 5.01415
 
 # Parsed into boolean
-Header: !T
-Header: !F
+Header: ?T
+Header: ?F
 ```
 
 To parse these header values, use `parseItem`:
@@ -50,7 +50,7 @@ console.log(sh.parseItem(header));
 Lists contain items separated by comma Here's an example
 
 ```
-Header: 5, "foo", bar, !T
+Header: 5, "foo", bar, ?T
 ```
 
 To parse these:

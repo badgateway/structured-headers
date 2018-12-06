@@ -293,7 +293,7 @@ class Parser {
       case 'F' :
         return false;
       default:
-        throw new Error('A "!" must be followed by "T" or "F"');
+        throw new Error('A "?" must be followed by "T" or "F"');
     }
 
   }
