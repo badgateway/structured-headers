@@ -6,6 +6,11 @@ ChangeLog
 
 * Package renamed to 'structured-headers'.
 * Conversion to typescript.
+* The `parseBinary` function is renamed to `parseByteSequence`, to match the
+  rename in draft-ietf-httpbis-header-structure-08.
+* Support for Booleans.
+* The `parseIdentifier` function is renamed to `parseToken`, to match the
+  rename in draft-ietf-httpbis-header-structure-09.
 
 
 0.0.2 (2018-03-27)
