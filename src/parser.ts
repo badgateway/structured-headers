@@ -200,7 +200,7 @@ class Parser {
     if (c === '*') {
       return this.parseByteSequence();
     }
-    if (c === '!') {
+    if (c === '?') {
       return this.parseBoolean();
     }
     if (c.match(/[0-9\-]/)) {
@@ -285,7 +285,7 @@ class Parser {
 
   parseBoolean(): boolean {
 
-    this.matchByte('!');
+    this.matchByte('?');
     const c = this.getByte();
     switch (c) {
       case 'T' :
