@@ -1,4 +1,4 @@
-const parse = require('../index').parseParameterizedList;
+const parse = require('../index').parseParamList;
 const expect = require('chai').expect;
 
 describe("Parameterized lists", () => {

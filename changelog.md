@@ -4,9 +4,15 @@ ChangeLog
 0.1.0 (????-??-??)
 ------------------
 
+* Fully up to date with [draft-ietf-httpbis-header-structure-09][2].
 * Package renamed to 'structured-headers'.
 * Conversion to typescript.
-
+* The `parseBinary` function is renamed to `parseByteSequence`, to match the
+  rename in draft-ietf-httpbis-header-structure-08.
+* Support for Booleans.
+* The `parseIdentifier` function is renamed to `parseToken`, to match the
+  rename in draft-ietf-httpbis-header-structure-09.
+* Renamed `parseParameterizedList` to `parseParamList`. It's shorter.
 
 0.0.2 (2018-03-27)
 ------------------
@@ -23,3 +29,4 @@ ChangeLog
 * Parses all of the [04 draft of the specification][1].
 
 [1]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-04#section-4.2
+[2]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-09

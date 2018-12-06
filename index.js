@@ -16,10 +16,17 @@ module.exports = {
 
   },
 
-  parseParameterizedList: function(input) {
+  parseListList: function(input) {
 
     var parser = new Parser(input);
-    return parser.parseParameterizedList();
+    return parser.parseListList();
+
+  },
+
+  parseParamList: function(input) {
+
+    var parser = new Parser(input);
+    return parser.parseParamList();
 
   },
 
