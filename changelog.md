@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-0.1.0 (????-??-??)
+0.1.0 (2018-12-06)
 ------------------
 
 * Fully up to date with [draft-ietf-httpbis-header-structure-09][2].
