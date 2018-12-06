@@ -1,7 +1,7 @@
 export PATH:=./node_modules/.bin/:$(PATH)
 
 .PHONY: build
-build: browser/structured-header.min.js tsbuild
+build: browser/structured-header.min.js
 
 .PHONY: clean
 clean:
@@ -33,7 +33,7 @@ watch:
 	tsc --watch
 
 .PHONY: browserbuild
-browserbuild:
+browserbuild: tsbuild
 	mkdir -p browser
 	webpack \
 		--optimize-minimize \
