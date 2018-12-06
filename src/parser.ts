@@ -1,14 +1,14 @@
-type Item = string | number | Buffer;
+type Item = string | number | Buffer | boolean;
 
 type Dictionary = {
   [s: string]: Item
 };
 
 type List = Item[];
+type ListList = List[];
 
 type ParameterizedIdentifier = [string, Dictionary];
 type ParameterizedList = ParameterizedIdentifier[];
-
 
 class Parser {
 
@@ -30,7 +30,7 @@ class Parser {
     while (true) {
 
       // Dictionary key
-      const key = this.parseIdentifier();
+      const key = this.parseToken();
       if (output[key] !== undefined) {
         throw new Error('Duplicate key in dictionary: ' + key);
       }
@@ -39,7 +39,7 @@ class Parser {
       this.matchByte('=');
 
       // Value
-      const value = this.parseItem();
+      const value = this.parseToken();
       output[key] = value;
 
       // Optional whitespace
@@ -92,6 +92,44 @@ class Parser {
 
   }
 
+  parseListList(): ListList {
+
+    const output:ListList = [[]];
+
+    while (!this.eol()) {
+
+      // Get item
+      const value = this.parseItem();
+      output[output.length - 1].push(value);
+
+      // Whitespace
+      this.skipOWS();
+
+      if (this.eol()) {
+        return output;
+      }
+
+      const separator = this.getByte();
+
+      switch(separator) {
+        case ',' :
+          // Next inner list
+          output.push([]);
+          break;
+        case ';' :
+          // Next item. Do nothing
+          break;
+        default :
+          throw new Error('Unexpected "' + separator + '". expected ";" or ","');
+      }
+
+      // Whitespace
+      this.skipOWS();
+
+    }
+    throw new Error('Unexpected end of string');
+
+  }
 
   parseParameterizedList(): ParameterizedList {
 
@@ -118,7 +156,7 @@ class Parser {
 
   parseParameterizedIdentifier(): ParameterizedIdentifier {
 
-    const identifier = this.parseIdentifier();
+    const identifier = this.parseToken();
     const parameters: Dictionary = {};
 
     while (true) {
@@ -135,7 +173,7 @@ class Parser {
       // Whitespace
       this.skipOWS();
 
-      const paramName = this.parseIdentifier();
+      const paramName = this.parseToken();
       let paramValue = null;
 
       // If there's an =, there's a value
@@ -160,13 +198,16 @@ class Parser {
       return this.parseString();
     }
     if (c === '*') {
-      return this.parseBinary();
+      return this.parseByteSequence();
+    }
+    if (c === '!') {
+      return this.parseBoolean();
     }
     if (c.match(/[0-9\-]/)) {
       return this.parseNumber();
     }
     if (c.match(/[a-z]/)) {
-      return this.parseIdentifier();
+      return this.parseToken();
     }
 
     throw new Error('Unexpected character: ' + c + ' on position ' + this.position);
@@ -214,7 +255,7 @@ class Parser {
 
   }
 
-  parseIdentifier(): string {
+  parseToken(): string {
 
     const identifierRegex = /^[a-z][a-z0-9_\-\*\/]{0,254}/;
     const result = this.input.substr(this.position).match(identifierRegex);
@@ -226,12 +267,12 @@ class Parser {
 
   }
 
-  parseBinary(): Buffer {
+  parseByteSequence(): Buffer {
 
     this.matchByte('*');
     const result = this.input.substr(this.position).match(/^([A-Za-z0-9\\+\\/=]*)\*/);
     if (!result) {
-      throw new Error('Couldn\'t parse binary item');
+      throw new Error('Couldn\'t parse byte sequence');
     }
     if (result[1].length % 4 !== 0) {
       throw new Error('Base64 strings should always have a length that\'s a multiple of 4. Did you forget padding?');
@@ -239,6 +280,21 @@ class Parser {
     this.position += result[0].length;
 
     return Buffer.from(result[1], 'base64');
+
+  }
+
+  parseBoolean(): boolean {
+
+    this.matchByte('!');
+    const c = this.getByte();
+    switch (c) {
+      case 'T' :
+        return true;
+      case 'F' :
+        return false;
+      default:
+        throw new Error('A "!" must be followed by "T" or "F"');
+    }
 
   }
 
