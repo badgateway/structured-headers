@@ -248,6 +248,9 @@ class Parser {
     if (match[0].indexOf('.') !== -1) {
       return parseFloat(match[0]);
     } else {
+      if (match[0].length > 16 || match[0][0] === '-' && match[0].length > 15) {
+        throw Error('Integers must not have more than 15 digits');
+      }
       return parseInt(match[0], 10);
     }
 
