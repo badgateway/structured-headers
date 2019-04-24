@@ -1,5 +1,7 @@
 export PATH:=./node_modules/.bin/:$(PATH)
 
+SOURCE_FILES:=$(shell find src/ -type f -name '*.ts')
+
 .PHONY: build
 build: browser/structured-header.min.js
 
@@ -9,7 +11,7 @@ clean:
 	rm -r dist/
 
 .PHONY: test
-test: lint test/httpwg-tests/list.json
+test: lint test/httpwg-tests/list.json dist/build
 	nyc mocha
 
 .PHONY: test-debug
@@ -24,22 +26,23 @@ lint:
 fix:
 	tslint -c tslint.json --project tsconfig.json 'src/**/*.ts' 'test/**/*.ts' --fix
 
-.PHONY: tsbuild
-tsbuild:
-	tsc
-
 .PHONY: watch
 watch:
 	tsc --watch
 
 .PHONY: browserbuild
-browserbuild: tsbuild
+browserbuild: dist/build
 	mkdir -p browser
 	webpack \
 		--optimize-minimize \
 		-p \
 		--display-modules \
 		--sort-modules-by size
+
+dist/build: $(SOURCE_FILES)
+	tsc
+	@# A fake file to keep track of the last build time
+	touch dist/build
 
 browser/structured-header.min.js: browserbuild
 

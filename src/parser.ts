@@ -340,10 +340,10 @@ class Parser {
     let result;
     switch (c) {
       case '0' :
-        result = true;
+        result = false;
         break;
       case '1' :
-        result = false;
+        result = true;
         break;
       default:
         throw new Error('A "?" must be followed by "0" or "1"');
