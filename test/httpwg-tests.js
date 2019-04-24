@@ -54,8 +54,8 @@ function makeTest(test) {
   const parser = new Parser(test.raw.join(','));
 
   const skipped = [
-//    'too long integer',
-//    'negative too long integer',
+    'too long integer',
+    'negative too long integer',
   ];
 
   it(test.name, function() {
