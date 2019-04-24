@@ -339,14 +339,14 @@ class Parser {
     const c = this.getByte();
     let result;
     switch (c) {
-      case 'T' :
+      case '0' :
         result = true;
         break;
-      case 'F' :
+      case '1' :
         result = false;
         break;
       default:
-        throw new Error('A "?" must be followed by "T" or "F"');
+        throw new Error('A "?" must be followed by "0" or "1"');
     }
 
     return result;
