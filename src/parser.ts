@@ -248,6 +248,9 @@ class Parser {
     if (match[0].indexOf('.') !== -1) {
       return parseFloat(match[0]);
     } else {
+      if (match[0].length > 16 || match[0][0] === '-' && match[0].length > 15) {
+        throw Error('Integers must not have more than 15 digits');
+      }
       return parseInt(match[0], 10);
     }
 
@@ -339,14 +342,14 @@ class Parser {
     const c = this.getByte();
     let result;
     switch (c) {
-      case 'T' :
-        result = true;
-        break;
-      case 'F' :
+      case '0' :
         result = false;
         break;
+      case '1' :
+        result = true;
+        break;
       default:
-        throw new Error('A "?" must be followed by "T" or "F"');
+        throw new Error('A "?" must be followed by "0" or "1"');
     }
 
     return result;

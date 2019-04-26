@@ -4,6 +4,9 @@ ChangeLog
 0.2.0 (2019-??-??)
 ------------------
 
+* Fully up to date with [draft-ietf-httpbis-header-structure-10][3].
+* True and False are now encoded as `?1` and `?0`.
+* Integers with more than 15 digits now error as per the new draft.
 * Updated all dependencies.
 
 
@@ -36,3 +39,4 @@ ChangeLog
 
 [1]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-04#section-4.2
 [2]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-09
+[3]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-10
