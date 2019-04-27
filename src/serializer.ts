@@ -15,14 +15,14 @@ export default class Serializer {
 
   serializeList(input: List): string {
 
-    return input.map(this.serializeItem).join(', ');
+    return input.map(this.serializeItem.bind(this)).join(', ');
 
   }
 
   serializeListList(input: ListList): string {
 
     return input.map(
-      innerList => innerList.map(this.serializeItem).join('; ')
+      innerList => innerList.map(this.serializeItem.bind(this)).join('; ')
     ).join(', ');
 
   }
@@ -49,7 +49,7 @@ export default class Serializer {
 
   serializeKey(input: string): string {
 
-    if (!input.match(/^[a-z][a-z0-9_-]*$/)) {
+    if (!/^[a-z][a-z0-9_-]*$/.test(input)) {
       throw new Error('Dictionary keys must start with a-z and only contain a-z0-9_-');
     }
 
@@ -94,7 +94,7 @@ export default class Serializer {
 
   serializeString(input: string): string {
 
-    if (/^[\x1F-\x7F]*$/.test(input)) {
+    if (!/^[\x1F-\x7F]*$/.test(input)) {
       throw new Error('Strings must be in the ASCII range');
     }
 
@@ -104,7 +104,7 @@ export default class Serializer {
 
   serializeToken(input: string): string {
 
-    if (/^[a-zA-Z][A-Za-z0-9_-\.\:%\*/]*$/.test(input)) {
+    if (!/^[a-zA-Z][a-zA-Z0-9_\-\.\:\%\*]*$/.test(input)) {
       throw new Error('Tokens must start with a letter and must only contain A-Za-z_-.:%*/');
     }
 
