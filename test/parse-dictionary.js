@@ -1,4 +1,4 @@
-const parse = require('../index').parseDictionary;
+const parse = require('../dist').parseDictionary;
 const expect = require('chai').expect;
 
 describe("Dictionaries", () => {

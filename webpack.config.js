@@ -1,6 +1,6 @@
 module.exports = [
   {
-    entry: './index',
+    entry: './dist/index',
     output: {
       path: __dirname + '/browser',
       filename: 'structured-header.min.js',

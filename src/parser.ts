@@ -1,16 +1,6 @@
-type Item = string | number | Buffer | boolean;
+import { Dictionary, Item, List, ListList, ParameterizedIdentifier, ParameterizedList } from './types';
 
-type Dictionary = {
-  [s: string]: Item
-};
-
-type List = Item[];
-type ListList = List[];
-
-type ParameterizedIdentifier = [string, Dictionary];
-type ParameterizedList = ParameterizedIdentifier[];
-
-class Parser {
+export default class Parser {
 
   input: string;
   position: number;
