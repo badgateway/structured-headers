@@ -1,9 +1,9 @@
 Structured Headers parser for Javascript
 =======================================
 
-This library is a parser for the [structured headers][1] specification.
-Currently it's still a draft, so this package is also in alpha until the
-specification stabilizes as a RFC.
+This library is a parser and serializer for the [structured headers][1]
+specification.  Currently it's still a draft, so this package is also in alpha
+until the specification stabilizes as a RFC.
 
 Installation
 ------------
@@ -119,6 +119,45 @@ console.log(sh.parseParamList(header));
 
 This will result in `[['foo', { param1: "value1" }], ['bar', { param2: "value2" }]`.
 
+
+### Serializing
+
+The serialiser functions work the exact same way, but in opposite direction.
+They all return strings.
+
+```javascript
+const sh = require('structured-headers');
+
+// Returns "foo", "bar"
+sh.serializeList(['foo', 'bar']);
+
+// Returns 1; 2, 'a'; 'b'
+sh.serializeListList([[1, 2], ['a', 'b']])
+
+// Returns a=1, b=?0
+sh.serializeDictionary({a: 1, b: false});
+
+// Returns foo q=0.5, bar;q=1
+sh.serializeParamList([
+  [foo, {q: 0.5}],
+  [bar, {q: 1}]
+]);
+
+// Returns 42
+sh.serializeItem(42);
+
+// Returns 5.5
+sh.serializeItem(5.5);
+
+// Returns "hello world"
+sh.serializeItem("hello world");
+
+// Returns ?1
+sh.serializeItem(true);
+
+// Returns a base-64 representation like: *aGVsbG8=*
+sh.serializeItem(Buffer.from('hello'))
+```
 
 Browser support
 ---------------
