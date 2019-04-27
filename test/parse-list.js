@@ -1,4 +1,4 @@
-const parse = require('../index').parseList;
+const parse = require('../dist').parseList;
 const expect = require('chai').expect;
 
 describe("Lists", () => {
