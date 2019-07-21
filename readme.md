@@ -1,6 +1,8 @@
 Structured Headers parser for Javascript
 =======================================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/evert/structured-headers.svg)](https://greenkeeper.io/)
+
 This library is a parser and serializer for the [structured headers][1]
 specification.  Currently it's still a draft, so this package is also in alpha
 until the specification stabilizes as a RFC.
