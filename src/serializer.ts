@@ -1,4 +1,4 @@
-import { Dictionary, Item, List, ListList, ParameterizedList } from './types';
+import { Dictionary, Item, List } from './types';
 
 export default class Serializer {
 
@@ -15,35 +15,31 @@ export default class Serializer {
 
   serializeList(input: List): string {
 
+    return input.map( listItem => {
+
+      let output = '';
+      if (Array.isArray(listItem.value)) {
+        output += '(' + listItem.value.map(this.serializeItem.bind(this)).join(' ') + ')';
+      } else {
+        output += this.serializeItem(listItem.value);
+      }
+      output += this.serializeParameters(listItem.parameters);
+      return output;
+    }).join(', ');
+
     return input.map(this.serializeItem.bind(this)).join(', ');
 
   }
 
-  serializeListList(input: ListList): string {
-
-    return input.map(
-      innerList => innerList.map(this.serializeItem.bind(this)).join('; ')
-    ).join(', ');
-
-  }
-
-  serializeParamList(input: ParameterizedList): string {
-
-    const output = [];
-    for (const [key, dict] of input) {
-      let item = '';
-      item += this.serializeKey(key);
-
-      for (const [dictKey, dictValue] of Object.entries(dict)) {
-        item += ';' + this.serializeKey(dictKey);
-        if (dictValue) {
-          item += '=' + this.serializeItem(dictValue);
-        }
+  serializeParameters(input: Dictionary): string {
+    let output = '';
+    for (const [dictKey, dictValue] of Object.entries(input)) {
+      output += ';' + this.serializeKey(dictKey);
+      if (dictValue) {
+        output += '=' + this.serializeItem(dictValue);
       }
-
-      output.push(item);
     }
-    return output.join(', ');
+    return output;
 
   }
 
@@ -88,7 +84,11 @@ export default class Serializer {
 
   serializeFloat(input: number): string {
 
-    return input.toString();
+    const parts = input.toString().split('.');
+    if (parts.length > 15 || input > 0 && parts.length > 14) {
+      throw new Error('When serializing floats, the "whole" part may not be larger than 14 digits');
+    }
+    return parts[0] + '.' + parts[1].substr(0, 15 - parts[0].length);
 
   }
 
