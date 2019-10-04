@@ -1,6 +1,18 @@
 ChangeLog
 =========
 
+0.3.0 (2019-10-03)
+------------------
+
+* Fully up to date with [draft-ietf-httpbis-header-structure-13][3].
+* Parameterized Lists and List of Lists are gone, their feautures are merged
+  into List and Dictionaries.
+* Both lists and dictionaries now require an object such as
+  `{value: x, parameters: y}`. This is a breaking change, but was required to
+  support parameters correctly everywhere.
+* Stricter float parsing.
+
+
 0.2.0 (2019-04-27)
 ------------------
 
@@ -41,3 +53,4 @@ ChangeLog
 [1]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-04#section-4.2
 [2]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-09
 [3]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-10
+[4]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-13
