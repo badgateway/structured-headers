@@ -1,8 +1,6 @@
 Structured Headers parser for Javascript
 =======================================
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/evert/structured-headers.svg)](https://greenkeeper.io/)
-
 This library is a parser and serializer for the [structured headers][1]
 specification.  Currently it's still a draft, so this package is also in alpha
 until the specification stabilizes as a RFC.
@@ -62,7 +60,33 @@ const sh = require('structured-headers');
 console.log(sh.parseList(header));
 ```
 
-This will result in `[5, "foo", "bar", true]`.
+This will result in the following object:
+
+```javascript
+[
+   {value: 5, parameters: {}},
+   {value: 'foo', parameters: {}},
+   {value: 'bar', parameters: {}},
+   {value: true, parameters: {}},
+]
+```
+
+This is an example of a more complex list:
+
+```
+Header: "foo"; param=1, "bar", ("sublistA", "sublistB")
+```
+
+Parsing this list will result in:
+
+```javascript
+[
+   {value: 'foo', parameters: {param: 1}},
+   {value: 'bar', parameters: {}},
+   {value: ['sublistA', 'sublistB'], parameters: {}},
+]
+```
+
 
 ### Parsing a dictionary
 
@@ -79,47 +103,14 @@ const sh = require('structured-headers');
 console.log(sh.parseDictionary(header));
 ```
 
-The output for this is an object: `{ foo: 'bar', baz: 5}`.
-
-### Parsing a list of lists
-
-A list of list is a 2-dimensional array. The top level is separated
-by commas, and the second level is separated by semi-colons.
-
-Every member in this list can be any item (string, boolean, number).
-
-
-```
-Example: "foo";"bar", "baz", "bat"; "one"
-```
-
-Parsing:
+The output for this is the following object:
 
 ```javascript
-const sh = require('structured-headers');
-console.log(sh.parseListList(header));
+{
+  foo: { value: 'bar', parameters: {} },
+  baz: { value: 5, parameters: {} },
+}
 ```
-
-This will result in `[['foo', 'bar'], ['baz'], ['bat', 'one']]`.
-
-### Parsing a parameterized list
-
-A parameterized list is a list for which every member can have
-one or more parameters, specified as a dictionary.
-
-```
-ExampleParamList: foo; param1: "value1", bar; "param2": "value2"
-```
-
-Parsing:
-
-
-```javascript
-const sh = require('structured-headers');
-console.log(sh.parseParamList(header));
-```
-
-This will result in `[['foo', { param1: "value1" }], ['bar', { param2: "value2" }]`.
 
 
 ### Serializing
@@ -131,19 +122,16 @@ They all return strings.
 const sh = require('structured-headers');
 
 // Returns "foo", "bar"
-sh.serializeList(['foo', 'bar']);
-
-// Returns 1; 2, 'a'; 'b'
-sh.serializeListList([[1, 2], ['a', 'b']])
+sh.serializeList([
+  {value: 'foo'},
+  {value: 'bar'}
+]);
 
 // Returns a=1, b=?0
-sh.serializeDictionary({a: 1, b: false});
-
-// Returns foo q=0.5, bar;q=1
-sh.serializeParamList([
-  [foo, {q: 0.5}],
-  [bar, {q: 1}]
-]);
+sh.serializeDictionary({
+  a: { value: 1},
+  b: { value: false},
+});
 
 // Returns 42
 sh.serializeItem(42);
