@@ -1,11 +1,20 @@
 export type Item = string | number | Buffer | boolean;
 
-export type Dictionary = {
-  [s: string]: Item
+export type Parameters = {
+  [key: string]: Item
 };
 
-export type List = Item[];
-export type ListList = List[];
+export type Dictionary = {
+  [key: string]: {
+    value: Item | Item[],
+    parameters?: Parameters
+  }
+};
 
-export type ParameterizedIdentifier = [string, Dictionary];
-export type ParameterizedList = ParameterizedIdentifier[];
+
+export type ListItem = {
+  value: Item | Item[],
+  parameters?: Parameters
+};
+
+export type List = ListItem[];

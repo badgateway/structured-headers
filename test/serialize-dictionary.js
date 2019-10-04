@@ -5,7 +5,11 @@ describe("Dictionaries", () => {
 
   it('should serialize dictionaries', () => {
 
-    const input = {a: 5, b: true, c: 'foo'};
+    const input = {
+      a: { value: 5 },
+      b: { value: true },
+      c: { value: 'foo' },
+    };
     expect(
       serialize(input)
     ).to.eql('a=5, b=?1, c="foo"');

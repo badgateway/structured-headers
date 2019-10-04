@@ -9,9 +9,9 @@ describe("Dictionaries", () => {
     var output = parse(input);
 
     var expected = {
-      foo: 1.23,
-      en: 'Applepie',
-      da: Buffer.from('w4ZibGV0w6ZydGUK', 'base64')
+      foo: {value: 1.23, parameters: {}},
+      en: {value: 'Applepie', parameters: {}},
+      da: {value: Buffer.from('w4ZibGV0w6ZydGUK', 'base64'), parameters: {}},
     };
 
     expect(output).to.deep.equal(expected);

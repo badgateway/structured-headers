@@ -1,13 +1,19 @@
-import { Dictionary, Item, List, ListList, ParameterizedList } from './types';
+import { Dictionary, Item, List, Parameters } from './types';
 
 export default class Serializer {
 
   serializeDictionary(input: Dictionary): string {
 
-    const output = [];
+    const output: string[] = [];
     for (const [key, value] of Object.entries(input)) {
-      output.push(this.serializeKey(key) + '=' + this.serializeItem(value));
+      output.push(
+        this.serializeKey(key) +
+        '=' +
+        this.serializeItemOrInnerList(value.value) +
+        this.serializeParameters(value.parameters)
+      );
     }
+
 
     return output.join(', ');
 
@@ -15,37 +21,14 @@ export default class Serializer {
 
   serializeList(input: List): string {
 
-    return input.map(this.serializeItem.bind(this)).join(', ');
+    return input.map( listItem => {
+
+      return this.serializeItemOrInnerList(listItem.value) + this.serializeParameters(listItem.parameters);
+
+    }).join(', ');
 
   }
 
-  serializeListList(input: ListList): string {
-
-    return input.map(
-      innerList => innerList.map(this.serializeItem.bind(this)).join('; ')
-    ).join(', ');
-
-  }
-
-  serializeParamList(input: ParameterizedList): string {
-
-    const output = [];
-    for (const [key, dict] of input) {
-      let item = '';
-      item += this.serializeKey(key);
-
-      for (const [dictKey, dictValue] of Object.entries(dict)) {
-        item += ';' + this.serializeKey(dictKey);
-        if (dictValue) {
-          item += '=' + this.serializeItem(dictValue);
-        }
-      }
-
-      output.push(item);
-    }
-    return output.join(', ');
-
-  }
 
   serializeKey(input: string): string {
 
@@ -79,20 +62,49 @@ export default class Serializer {
 
   }
 
-  serializeInt(input: number): string {
+  private serializeParameters(input: Parameters): string {
+    if (!input) {
+      return '';
+    }
+    let output = '';
+    for (const [paramKey, paramValue] of Object.entries(input)) {
+      output += ';' + this.serializeKey(paramKey);
+      if (paramValue) {
+        output += '=' + this.serializeItem(paramValue);
+      }
+    }
+    return output;
+
+  }
+
+  private serializeItemOrInnerList(input: Item | Item[]) {
+
+    if (Array.isArray(input)) {
+      return '(' + input.map( entry => this.serializeItem(entry)).join(' ') + ')';
+    } else {
+      return this.serializeItem(input);
+    }
+
+  }
+
+  private serializeInt(input: number): string {
     if (input > 999_999_999_999_999 || input < -999_999_999_999_999) {
       throw new Error('Integers may not be larger than 15 digits');
     }
     return input.toString();
   }
 
-  serializeFloat(input: number): string {
+  private serializeFloat(input: number): string {
 
-    return input.toString();
+    const parts = input.toString().split('.');
+    if (parts[0].length > 15 || input > 0 && parts[0].length > 14) {
+      throw new Error('When serializing floats, the "whole" part may not be larger than 14 digits');
+    }
+    return parts[0] + '.' + parts[1].substr(0, 15 - parts[0].length);
 
   }
 
-  serializeString(input: string): string {
+  private serializeString(input: string): string {
 
     if (!/^[\x1F-\x7F]*$/.test(input)) {
       throw new Error('Strings must be in the ASCII range');
@@ -102,23 +114,24 @@ export default class Serializer {
 
   }
 
-  serializeToken(input: string): string {
+  /*
+  private serializeToken(input: string): string {
 
     if (!/^[a-zA-Z][a-zA-Z0-9_\-\.\:\%\*]*$/.test(input)) {
-      throw new Error('Tokens must start with a letter and must only contain A-Za-z_-.:%*/');
+      throw new Error('Tokens must start with a letter and must only contain A-Za-z_-.:%/*');
     }
 
     return input;
 
-  }
+  }*/
 
-  serializeByteSequence(input: Buffer): string {
+  private serializeByteSequence(input: Buffer): string {
 
     return '*' + input.toString('base64') + '*';
 
   }
 
-  serializeBoolean(input: boolean): string {
+  private serializeBoolean(input: boolean): string {
 
     return input ? '?1' : '?0';
 

@@ -1,4 +1,4 @@
-import { Dictionary, Item, List, ListList, ParameterizedIdentifier, ParameterizedList } from './types';
+import { Dictionary, Item, List, ListItem, Parameters } from './types';
 
 export default class Parser {
 
@@ -17,7 +17,7 @@ export default class Parser {
 
     const output: Dictionary = {};
 
-    while (true) {
+    while (!this.eol()) {
 
       // Dictionary key
       const key = this.parseKey();
@@ -28,8 +28,7 @@ export default class Parser {
       // Equals sign
       this.matchByte('=');
 
-      // Value
-      const value = this.parseItemStr();
+      const value = this.parseParameterizedMember();
       output[key] = value;
 
       // Optional whitespace
@@ -51,136 +50,30 @@ export default class Parser {
       }
 
     }
+    return output;
 
   }
 
   parseList(): List {
 
-    const output = [];
-
+    const output: List = [];
     while (!this.eol()) {
 
-      // Get item
-      const value = this.parseItemStr();
-      output.push(value);
-
-      // Whitespace
+      output.push(this.parseParameterizedMember());
       this.skipOWS();
-
       if (this.eol()) {
-        return output;
-      }
-
-      // Grab a comma
-      this.matchByte(',');
-
-      // Whitespace
-      this.skipOWS();
-
-    }
-    throw new Error('Unexpected end of string');
-
-  }
-
-  parseListList(): ListList {
-
-    const output: ListList = [[]];
-
-    while (!this.eol()) {
-
-      // Get item
-      const value = this.parseItemStr();
-      output[output.length - 1].push(value);
-
-      // Whitespace
-      this.skipOWS();
-
-      if (this.eol()) {
-        return output;
-      }
-
-      const separator = this.getByte();
-
-      switch (separator) {
-        case ',' :
-          // Next inner list
-          output.push([]);
-          break;
-        case ';' :
-          // Next item. Do nothing
-          break;
-        default :
-          throw new Error('Unexpected "' + separator + '". expected ";" or ","');
-      }
-
-      // Whitespace
-      this.skipOWS();
-
-    }
-    throw new Error('Unexpected end of string');
-
-  }
-
-  parseParamList(): ParameterizedList {
-
-    const output = [];
-    while (!this.eol()) {
-
-      // Parse item
-      output.push(this.parseParamListItem());
-
-      // Whitespace
-      this.skipOWS();
-
-      if (this.eol()) {
-        return output;
-      }
-
-      this.matchByte(',');
-      this.skipOWS();
-
-    }
-    throw new Error('Unexpected end of string');
-
-  }
-
-  parseParamListItem(): ParameterizedIdentifier {
-
-    const identifier = this.parseToken();
-    const parameters: Dictionary = {};
-
-    while (true) {
-
-      // Whitespace
-      this.skipOWS();
-
-      // Stop if parameter didn't start with ;
-      if (this.input[this.position] !== ';') {
         break;
       }
-      this.position++;
+      this.matchByte(',');
 
-      // Whitespace
       this.skipOWS();
 
-      const paramName = this.parseKey();
-
-      if (paramName in parameters) {
-        throw new Error('Duplicate parameter in parameterized list: ' + paramName);
+      if (this.eol()) {
+        throw new Error('Unexpected end of string. Was there a trailing comma?');
       }
-      let paramValue = null;
-
-      // If there's an =, there's a value
-      if (this.input[this.position] === '=') {
-        this.position++;
-        paramValue = this.parseItemStr();
-      }
-
-      parameters[paramName] = paramValue;
-
     }
 
-    return [identifier, parameters];
+    return output;
 
   }
 
@@ -193,6 +86,65 @@ export default class Parser {
     const r = this.parseItemStr();
     this.end();
     return r;
+
+  }
+
+
+  private parseParameterizedMember(): ListItem {
+
+    let value;
+    if (this.input[this.position] === '(') {
+      value = this.parseInnerList();
+    } else {
+      value = this.parseItemStr();
+    }
+    const parameters: Parameters = {};
+
+    while (!this.eol()) {
+      this.skipOWS();
+      if (this.input[this.position] !== ';') {
+        break;
+      }
+      this.getByte();
+      this.skipOWS();
+      const paramKey = this.parseKey();
+      if (paramKey in parameters) {
+        throw new Error('Duplicate parameter key: ' + paramKey);
+      }
+      let paramValue = null;
+      if (this.input[this.position] === '=') {
+        this.getByte();
+        paramValue = this.parseItemStr();
+      }
+      parameters[paramKey] = paramValue;
+    }
+    return {
+      value,
+      parameters
+    };
+
+  }
+
+  private parseInnerList(): Item[] {
+
+    this.matchByte('(');
+    const result: Item[] = [];
+
+    while (!this.eol()) {
+
+      this.skipOWS();
+
+      if (this.input[this.position] === ')') {
+        this.getByte();
+        break;
+      }
+      result.push(this.parseItemStr());
+      if (this.input[this.position] !== ' ' && this.input[this.position] !== ')') {
+        throw new Error('Malformed list. Expected whitespace or )');
+      }
+    }
+
+    return result;
 
   }
 
@@ -233,13 +185,13 @@ export default class Parser {
 
     const match = this.input.substr(
       this.position
-    ).match(/[0-9\-]([0-9])*(\.[0-9]+)?/);
+    ).match(/[0-9\-]([0-9])*(\.[0-9]{1,6})?/);
     this.position += match[0].length;
     if (match[0].indexOf('.') !== -1) {
       return parseFloat(match[0]);
     } else {
-      if (match[0].length > 16 || match[0][0] === '-' && match[0].length > 15) {
-        throw Error('Integers must not have more than 15 digits');
+      if (match[0].length > 16 || (match[0][0] !== '-' && match[0].length > 15)) {
+        throw Error('Integers must not have more than 15 digits.' + match[0].length);
       }
       return parseInt(match[0], 10);
     }
@@ -300,7 +252,7 @@ export default class Parser {
    */
   parseKey(): string {
 
-    const identifierRegex = /^[a-z][a-z0-9_\-]{0,254}/;
+    const identifierRegex = /^[a-z][a-z0-9_\-\*]{0,254}/;
     const result = this.input.substr(this.position).match(identifierRegex);
     if (!result) {
       throw Error('Expected identifier at position: ' + this.position);
