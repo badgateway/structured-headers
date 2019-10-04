@@ -54,8 +54,8 @@ function makeTest(test) {
   const parser = new Parser(test.raw.join(','));
 
   const skipped = [
-    'long integer',
-    'long negative integer',
+    //'long integer',
+    //'long negative integer',
   ];
 
   it(test.name, function() {
@@ -76,15 +76,16 @@ function makeTest(test) {
           break;
         case 'list' :
           result = parser.parseList();
-          break;
-        case 'list-list' :
-          result = parser.parseListList();
-          break;
-        case 'param-list' :
-          result = parser.parseParamList();
+          // The tests have a slightly different format for the results.
+          result = result.map( item => [item.value, item.parameters] );
           break;
         case 'dictionary' :
-          result = parser.parseDictionary();
+          result = {};
+          const tmpResult = parser.parseDictionary();
+          // The tests have a slightly different format for the results.
+          for(const [key, value] of Object.entries(tmpResult)) {
+            result[key] = [value.value, value.parameters];
+          }
           break;
         default:
           throw new Error('Unsupported header type: ' + test.header_type);

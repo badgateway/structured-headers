@@ -1,4 +1,4 @@
-import { Dictionary, Item, List, ListItem } from './types';
+import { Dictionary, Item, List, ListItem, Parameters } from './types';
 
 export default class Parser {
 
@@ -17,7 +17,7 @@ export default class Parser {
 
     const output: Dictionary = {};
 
-    while (true) {
+    while (!this.eol()) {
 
       // Dictionary key
       const key = this.parseKey();
@@ -28,8 +28,7 @@ export default class Parser {
       // Equals sign
       this.matchByte('=');
 
-      // Value
-      const value = this.parseItemStr();
+      const value = this.parseParameterizedMember();
       output[key] = value;
 
       // Optional whitespace
@@ -51,13 +50,14 @@ export default class Parser {
       }
 
     }
+    return output;
 
   }
 
   parseList(): List {
 
     const output: List = [];
-    while (true) {
+    while (!this.eol()) {
 
       output.push(this.parseParameterizedMember());
       this.skipOWS();
@@ -77,61 +77,6 @@ export default class Parser {
 
   }
 
-  parseParameterizedMember(): ListItem {
-
-    let value;
-    if (this.input[this.position] === '(') {
-      value = this.parseInnerList();
-    } else {
-      value = this.parseItem();
-    }
-    const parameters: Dictionary = {};
-
-    while (!this.eol()) {
-      this.skipOWS();
-      if (this.input[this.position] !== ';') {
-        break;
-      }
-      this.getByte();
-      this.skipOWS();
-      const key = this.parseKey();
-      if (key in parameters) {
-        throw new Error('Duplicate parameter key: ' + key);
-      }
-      const value = null;
-      if (this.input[this.position] === '=') {
-        this.getByte();
-        this.parseItem();
-      }
-      parameters[key] = value;
-    }
-    return {
-      value,
-      parameters
-    };
-
-  }
-
-  parseInnerList(): Item[] {
-
-    this.matchByte('(');
-    const result: Item[] = [];
-
-    while (!this.eol()) {
-      if (this.input[this.position] === ')') {
-        this.getByte();
-        break;
-      }
-      result.push(this.parseItem());
-      if (this.input[this.position] !== ' ' && this.input[this.position] !== ')') {
-        throw new Error('Malformed list. Expected whitespace or )');
-      }
-    }
-
-    return result;
-
-  }
-
   /**
    * Parses a header as "item".
    */
@@ -141,6 +86,65 @@ export default class Parser {
     const r = this.parseItemStr();
     this.end();
     return r;
+
+  }
+
+
+  private parseParameterizedMember(): ListItem {
+
+    let value;
+    if (this.input[this.position] === '(') {
+      value = this.parseInnerList();
+    } else {
+      value = this.parseItemStr();
+    }
+    const parameters: Parameters = {};
+
+    while (!this.eol()) {
+      this.skipOWS();
+      if (this.input[this.position] !== ';') {
+        break;
+      }
+      this.getByte();
+      this.skipOWS();
+      const paramKey = this.parseKey();
+      if (paramKey in parameters) {
+        throw new Error('Duplicate parameter key: ' + paramKey);
+      }
+      let paramValue = null;
+      if (this.input[this.position] === '=') {
+        this.getByte();
+        paramValue = this.parseItemStr();
+      }
+      parameters[paramKey] = paramValue;
+    }
+    return {
+      value,
+      parameters
+    };
+
+  }
+
+  private parseInnerList(): Item[] {
+
+    this.matchByte('(');
+    const result: Item[] = [];
+
+    while (!this.eol()) {
+
+      this.skipOWS();
+
+      if (this.input[this.position] === ')') {
+        this.getByte();
+        break;
+      }
+      result.push(this.parseItemStr());
+      if (this.input[this.position] !== ' ' && this.input[this.position] !== ')') {
+        throw new Error('Malformed list. Expected whitespace or )');
+      }
+    }
+
+    return result;
 
   }
 
@@ -181,13 +185,13 @@ export default class Parser {
 
     const match = this.input.substr(
       this.position
-    ).match(/[0-9\-]([0-9])*(\.[0-9]+)?/);
+    ).match(/[0-9\-]([0-9])*(\.[0-9]{1,6})?/);
     this.position += match[0].length;
     if (match[0].indexOf('.') !== -1) {
       return parseFloat(match[0]);
     } else {
-      if (match[0].length > 16 || match[0][0] === '-' && match[0].length > 15) {
-        throw Error('Integers must not have more than 15 digits');
+      if (match[0].length > 16 || (match[0][0] !== '-' && match[0].length > 15)) {
+        throw Error('Integers must not have more than 15 digits.' + match[0].length);
       }
       return parseInt(match[0], 10);
     }

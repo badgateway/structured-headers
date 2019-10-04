@@ -1,13 +1,19 @@
-import { Dictionary, Item, List } from './types';
+import { Dictionary, Item, List, Parameters } from './types';
 
 export default class Serializer {
 
   serializeDictionary(input: Dictionary): string {
 
-    const output = [];
+    const output: string[] = [];
     for (const [key, value] of Object.entries(input)) {
-      output.push(this.serializeKey(key) + '=' + this.serializeItem(value));
+      output.push(
+        this.serializeKey(key) +
+        '=' +
+        this.serializeItemOrInnerList(value.value) +
+        this.serializeParameters(value.parameters)
+      );
     }
+
 
     return output.join(', ');
 
@@ -31,17 +37,6 @@ export default class Serializer {
 
   }
 
-  serializeParameters(input: Dictionary): string {
-    let output = '';
-    for (const [dictKey, dictValue] of Object.entries(input)) {
-      output += ';' + this.serializeKey(dictKey);
-      if (dictValue) {
-        output += '=' + this.serializeItem(dictValue);
-      }
-    }
-    return output;
-
-  }
 
   serializeKey(input: string): string {
 
@@ -75,14 +70,39 @@ export default class Serializer {
 
   }
 
-  serializeInt(input: number): string {
+  private serializeParameters(input: Parameters): string {
+    if (!input) {
+      return '';
+    }
+    let output = '';
+    for (const [paramKey, paramValue] of Object.entries(input)) {
+      output += ';' + this.serializeKey(paramKey);
+      if (paramValue) {
+        output += '=' + this.serializeItem(paramValue);
+      }
+    }
+    return output;
+
+  }
+
+  private serializeItemOrInnerList(input: Item | Item[]) {
+
+    if (Array.isArray(input)) {
+      return '(' + input.map( entry => this.serializeItem(entry)).join(' ') + ')';
+    } else {
+      return this.serializeItem(input);
+    }
+
+  }
+
+  private serializeInt(input: number): string {
     if (input > 999_999_999_999_999 || input < -999_999_999_999_999) {
       throw new Error('Integers may not be larger than 15 digits');
     }
     return input.toString();
   }
 
-  serializeFloat(input: number): string {
+  private serializeFloat(input: number): string {
 
     const parts = input.toString().split('.');
     if (parts.length > 15 || input > 0 && parts.length > 14) {
@@ -92,7 +112,7 @@ export default class Serializer {
 
   }
 
-  serializeString(input: string): string {
+  private serializeString(input: string): string {
 
     if (!/^[\x1F-\x7F]*$/.test(input)) {
       throw new Error('Strings must be in the ASCII range');
@@ -102,23 +122,24 @@ export default class Serializer {
 
   }
 
-  serializeToken(input: string): string {
+  /*
+  private serializeToken(input: string): string {
 
     if (!/^[a-zA-Z][a-zA-Z0-9_\-\.\:\%\*]*$/.test(input)) {
-      throw new Error('Tokens must start with a letter and must only contain A-Za-z_-.:%*/');
+      throw new Error('Tokens must start with a letter and must only contain A-Za-z_-.:%/*');
     }
 
     return input;
 
-  }
+  }*/
 
-  serializeByteSequence(input: Buffer): string {
+  private serializeByteSequence(input: Buffer): string {
 
     return '*' + input.toString('base64') + '*';
 
   }
 
-  serializeBoolean(input: boolean): string {
+  private serializeBoolean(input: boolean): string {
 
     return input ? '?1' : '?0';
 

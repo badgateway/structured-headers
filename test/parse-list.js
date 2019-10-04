@@ -9,9 +9,9 @@ describe("Lists", () => {
     var output = parse(input);
 
     var expected = [
-      'foo',
-      'bar',
-      'baz_45'
+      {value: 'foo', parameters: {}},
+      {value: 'bar', parameters: {}},
+      {value: 'baz_45', parameters: {}},
     ];
 
     expect(output).to.deep.equal(expected);
@@ -24,10 +24,10 @@ describe("Lists", () => {
     var output = parse(input);
 
     var expected = [
-      'foo',
-      'stringA',
-      'string"B"',
-      'string\\C'
+      {value: 'foo', parameters: {}},
+      {value: 'stringA', parameters: {}},
+      {value: 'string"B"', parameters: {}},
+      {value: 'string\\C', parameters: {}},
     ];
 
     expect(output).to.deep.equal(expected);

@@ -1,13 +1,20 @@
 export type Item = string | number | Buffer | boolean;
 
+export type Parameters = {
+  [key: string]: Item
+};
+
 export type Dictionary = {
-  [s: string]: Item
+  [key: string]: {
+    value: Item | Item[],
+    parameters?: Parameters
+  }
 };
 
 
 export type ListItem = {
   value: Item | Item[],
-  parameters: Dictionary
+  parameters?: Parameters
 };
 
 export type List = ListItem[];

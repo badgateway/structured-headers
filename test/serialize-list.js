@@ -5,7 +5,12 @@ describe("Lists", () => {
 
   it('should serialize lists', () => {
 
-    const input = ['foo', 'bar', 5, true];
+    const input = [
+      {value: 'foo'},
+      {value: 'bar'},
+      {value: 5},
+      {value: true},
+    ];
     expect(
       serialize(input)
     ).to.eql('"foo", "bar", 5, ?1');
