@@ -18,12 +18,29 @@ describe("Items", () => {
 
   });
 
+  it('should fail when serializing too large floats', () => {
+
+    const input = 123456789012345.25;
+    expect( () => serialize(input) ).to.throw(Error);
+
+  });
+
   it('should serialize strings', () => {
 
     const input = "hello";
     expect(
       serialize(input)
     ).to.eql('"hello"');
+
+  });
+  it('should serialize booleans', () => {
+
+    expect(
+      serialize(true)
+    ).to.eql('?1');
+    expect(
+      serialize(false)
+    ).to.eql('?0');
 
   });
 

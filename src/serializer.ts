@@ -23,17 +23,9 @@ export default class Serializer {
 
     return input.map( listItem => {
 
-      let output = '';
-      if (Array.isArray(listItem.value)) {
-        output += '(' + listItem.value.map(this.serializeItem.bind(this)).join(' ') + ')';
-      } else {
-        output += this.serializeItem(listItem.value);
-      }
-      output += this.serializeParameters(listItem.parameters);
-      return output;
-    }).join(', ');
+      return this.serializeItemOrInnerList(listItem.value) + this.serializeParameters(listItem.parameters);
 
-    return input.map(this.serializeItem.bind(this)).join(', ');
+    }).join(', ');
 
   }
 
@@ -105,7 +97,7 @@ export default class Serializer {
   private serializeFloat(input: number): string {
 
     const parts = input.toString().split('.');
-    if (parts.length > 15 || input > 0 && parts.length > 14) {
+    if (parts[0].length > 15 || input > 0 && parts[0].length > 14) {
       throw new Error('When serializing floats, the "whole" part may not be larger than 14 digits');
     }
     return parts[0] + '.' + parts[1].substr(0, 15 - parts[0].length);
