@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/evert/structured-header#readme",
   "devDependencies": {
-    "@types/node": "^12.7.11",
+    "@types/node": "^12.7.12",
     "base32-encode": "^1.1.1",
     "chai": "^4.2.0",
     "mocha": "^6.2.1",
