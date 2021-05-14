@@ -26,7 +26,7 @@ export type Parameters = Map<string, Item>;
  * There can be zero or more members, and their keys are unique in the scope
  * of the Dictionary they occur within.
  */
-export type Dictionary = Record<string, Item|InnerList>;
+export type Dictionary = Map<string, Item|InnerList>;
 
 export class Token {
 

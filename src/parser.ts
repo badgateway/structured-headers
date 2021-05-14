@@ -22,12 +22,37 @@ export default class Parser {
 
   parseDictionary(): Dictionary {
 
-    throw new Error('Not implemented');
+    this.skipWS();
+    const dictionary = new Map();
+    while(!this.eof()) {
+
+      const thisKey = this.parseKey();
+      let member;
+      if (this.lookChar()==='=') {
+        this.pos++;
+        member = this.parseItemOrInnerList();
+      } else {
+        member = [true, this.parseParameters()];
+      }
+      dictionary.set(thisKey, member);
+      this.skipOWS();
+      if (this.eof()) {
+        return dictionary;
+      }
+      this.expectChar(',');
+      this.pos++;
+      this.skipOWS();
+      if (this.eof()) {
+        throw new ParseError(this.pos, 'Dictionary contained a trailing comma');
+      }
+    }
+    return dictionary;
 
   }
 
   parseList(): List {
 
+    this.skipWS();
     const members: List = [];
     while(!this.eof()) {
       members.push(
@@ -51,7 +76,7 @@ export default class Parser {
 
   parseItem(standaloneItem: boolean = true): Item {
 
-    this.skipWS();
+    if (standaloneItem) this.skipWS();
 
     const result: Item = [
       this.parseBareItem(),
@@ -133,8 +158,15 @@ export default class Parser {
       if (char!==';') {
         break;
       }
-
-      throw new Error('Not implemented');
+      this.pos++;
+      this.skipWS();
+      const key = this.parseKey();
+      let value: BareItem = true;
+      if (this.lookChar() === '=') {
+        this.pos++;
+        value = this.parseBareItem();
+      }
+      parameters.set(key, value);
     }
 
     return parameters;
@@ -216,7 +248,7 @@ export default class Parser {
         outputString+=nextChar;
       } else if (char === '"') {
         return outputString;
-      } else if (!/^[\x1F-\x7F]$/.test(char)) { /* eslint-disable-line no-control-regex */
+      } else if (!/^[\x20-\x7E]$/.test(char)) { /* eslint-disable-line no-control-regex */
         throw new Error('Strings must be in the ASCII range');
       } else {
         outputString += char;
@@ -279,6 +311,26 @@ export default class Parser {
       return false;
     }
     throw new ParseError(this.pos, 'Unexpected character. Expected a "1" or a "0"');
+
+  }
+
+  parseKey(): string {
+
+    if (!this.lookChar().match(/^[a-z*]/)) {
+      throw new ParseError(this.pos, 'A key must begin with an asterisk or letter (a-z)');
+    }
+
+    let outputString = '';
+
+    while(!this.eof()) {
+      const char = this.lookChar();
+      if (!/^[a-z0-9_\-.*]$/.test(char)) {
+        return outputString;
+      }
+      outputString += this.getChar();
+    }
+
+    return outputString;
 
   }
 

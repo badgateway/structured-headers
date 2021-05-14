@@ -79,29 +79,15 @@ function makeTest(test) {
     try {
       switch(test.header_type) {
         case 'item' :
-          const parseResult = parser.parseItem();
-          result = [parseResult[0], []];
+          result = parser.parseItem();
           break;
         case 'list' :
           result = parser.parseList();
-          result = result.map( item => {
-            if (Array.isArray(item[0])) {
-              return [
-                item[0].map(innerItem => [innerItem[0], []]),
-                []
-              ];
-            } else {
-              return [item[0], []];
-            }
-          });
           break;
         case 'dictionary' :
-          result = {};
+          result = [];
           const tmpResult = parser.parseDictionary();
-          // The tests have a slightly different format for the results.
-          for(const [key, value] of Object.entries(tmpResult)) {
-            result[key] = [value.value, value.parameters];
-          }
+          result = Array.from(tmpResult.entries());
           break;
         default:
           throw new Error('Unsupported header type: ' + test.header_type);
@@ -166,6 +152,11 @@ function deepClean(input) {
       __type: 'binary',
       value: base32Encode(Buffer.from(input.toBase64(), 'base64'), 'RFC4648')
     }
+  }
+  if (input instanceof Map) {
+    return Array.from(input.entries()).map( ([key, value]) => {
+      return [key, deepClean(value)];
+    });
   }
 
   if (Array.isArray(input)) {
