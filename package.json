@@ -4,7 +4,7 @@
   "description": "Implementation of draft-ietf-httpbis-header-structure, structured headers for HTTP.",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/eslint --quiet 'src/**/*.ts' && mocha",
+    "test": "make test",
     "prepare": "make build",
     "build": "make build"
   },
