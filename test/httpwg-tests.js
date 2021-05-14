@@ -1,5 +1,6 @@
 const expect = require('chai').expect;
 const Parser = require('../dist/parser').default;
+const { Token } = require('../dist/types');
 const base32Encode = require('base32-encode');
 const fs = require('fs');
 
@@ -70,6 +71,7 @@ function makeTest(test) {
     let caughtError;
     let result;
     let expected = test.expected;
+
     try {
       switch(test.header_type) {
         case 'item' :
@@ -78,8 +80,7 @@ function makeTest(test) {
           break;
         case 'list' :
           result = parser.parseList();
-          // The tests have a slightly different format for the results.
-          result = result.map( item => [item.value, item.parameters] );
+          result = result.map( item => [item[0], []] );
           break;
         case 'dictionary' :
           result = {};
@@ -143,6 +144,13 @@ function deepClean(input) {
 
   if(input instanceof Buffer) {
     return base32Encode(input, 'RFC4648');
+  }
+
+  if(input instanceof Token) {
+    return {
+      __type: 'token',
+      value: input.toString()
+    }
   }
 
   if (Array.isArray(input)) {

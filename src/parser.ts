@@ -1,4 +1,4 @@
-import { Dictionary, List, Item, BareItem, Parameters } from './types';
+import { Dictionary, List, Item, BareItem, Parameters, Token, InnerList } from './types';
 
 class ParseError extends Error {
 
@@ -22,13 +22,30 @@ export default class Parser {
 
   parseDictionary(): Dictionary {
 
-    return {};
+    throw new Error('Not implemented');
 
   }
 
   parseList(): List {
 
-    return [];
+    const members: List = [];
+    while(!this.eof()) {
+      members.push(
+        this.parseItemOrInnerList()
+      );
+      this.skipOWS();
+      if (this.eof()) {
+        return members;
+      }
+      this.expectChar(',');
+      this.pos++;
+      this.skipOWS();
+      if (this.eof()) {
+        throw new ParseError(this.pos, 'A list may not end with a trailing comma');
+      }
+    }
+
+    return members;
 
   }
 
@@ -49,6 +66,22 @@ export default class Parser {
 
   }
 
+  parseItemOrInnerList(): Item|InnerList {
+
+    if (this.lookChar()==='(') {
+      return this.parseInnerList();
+    } else {
+      return this.parseItem(false);
+    }
+
+  }
+
+  parseInnerList(): InnerList {
+
+    throw new Error('Not implemented');
+
+  }
+
   parseBareItem(): BareItem {
 
     const char = this.lookChar();
@@ -57,6 +90,9 @@ export default class Parser {
     }
     if (char === '"') {
       return this.parseString();
+    }
+    if (char.match(/^[A-Za-z*]/)) {
+      return this.parseToken();
     }
 
     throw new Error('Not implemented');
@@ -165,6 +201,26 @@ export default class Parser {
 
   }
 
+  parseToken(): Token {
+
+    if (!this.lookChar().match(/^[A-Za-z*]/)) {
+      throw new ParseError(this.pos, 'A token must begin with an asterisk or letter (A-Z, a-z)');
+    }
+
+    let outputString = '';
+
+    while(!this.eof()) {
+      const char = this.lookChar();
+      if (!/^[:/!#$%&'*+\-.^_`|~A-Za-z0-9]$/.test(char)) {
+        return new Token(outputString);
+      }
+      outputString += this.getChar();
+    }
+
+    return new Token(outputString);
+
+  }
+
   /**
    * Looks at the next character without advancing the cursor.
    */
@@ -195,7 +251,19 @@ export default class Parser {
     return this.pos>=this.input.length;
 
   }
+  // Advances the pointer to skip all whitespace.
+  private skipOWS(): void {
 
+    while (true) {
+      const c = this.input.substr(this.pos, 1);
+      if (c === ' ' || c === '\t') {
+        this.pos++;
+      } else {
+        break;
+      }
+    }
+
+  }
 
 }
 
