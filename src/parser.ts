@@ -169,7 +169,7 @@ export default class Parser {
     if (c === '?') {
       return this.parseBoolean();
     }
-    if (c.match(/[0-9\-]/)) {
+    if (c.match(/[0-9-]/)) {
       return this.parseNumber();
     }
     if (c.match(/[a-zA-Z]/)) {
@@ -185,7 +185,7 @@ export default class Parser {
 
     const match = this.input.substr(
       this.position
-    ).match(/[0-9\-]([0-9])*(\.[0-9]{1,6})?/);
+    ).match(/[0-9-]([0-9])*(\.[0-9]{1,6})?/);
     this.position += match[0].length;
     if (match[0].indexOf('.') !== -1) {
       return parseFloat(match[0]);
@@ -207,13 +207,14 @@ export default class Parser {
       const c = this.getByte();
       switch (c) {
 
-        case '\\' :
+        case '\\' : {
           const c2 = this.getByte();
           if (c2 !== '"' && c2 !== '\\') {
             throw new Error('Expected a " or \\ on position: ' + (this.position - 1));
           }
           output += c2;
           break;
+        }
         case '"' :
           return output;
         default :
@@ -237,7 +238,7 @@ export default class Parser {
    */
   parseToken(): string {
 
-    const identifierRegex = /^[a-zA-Z][a-zA-Z0-9_\-\.\:\%\*\/]*/;
+    const identifierRegex = /^[a-zA-Z][a-zA-Z0-9_\-.:%*/]*/;
     const result = this.input.substr(this.position).match(identifierRegex);
     if (!result) {
       throw Error('Expected identifier at position: ' + this.position);
@@ -252,7 +253,7 @@ export default class Parser {
    */
   parseKey(): string {
 
-    const identifierRegex = /^[a-z][a-z0-9_\-\*]{0,254}/;
+    const identifierRegex = /^[a-z][a-z0-9_\-*]{0,254}/;
     const result = this.input.substr(this.position).match(identifierRegex);
     if (!result) {
       throw Error('Expected identifier at position: ' + this.position);

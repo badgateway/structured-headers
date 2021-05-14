@@ -1,10 +1,10 @@
 {
   "name": "structured-headers",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Implementation of draft-ietf-httpbis-header-structure, structured headers for HTTP.",
   "main": "index.js",
   "scripts": {
-    "test": "eslint lib/ && nyc mocha",
+    "test": "make test",
     "prepare": "make build",
     "build": "make build"
   },
@@ -23,13 +23,15 @@
   },
   "homepage": "https://github.com/evert/structured-header#readme",
   "devDependencies": {
-    "@types/node": "^12.7.12",
+    "@types/node": "^12.20.13",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
+    "@typescript-eslint/parser": "^4.23.0",
     "base32-encode": "^1.1.1",
     "chai": "^4.2.0",
+    "eslint": "^7.26.0",
     "mocha": "^6.2.1",
     "nyc": "^14.1.1",
     "ts-node": "^8.4.1",
-    "tslint": "^5.20.0",
     "typescript": "^3.6.3",
     "webpack": "^4.41.1",
     "webpack-cli": "^3.3.9"

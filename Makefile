@@ -1,5 +1,3 @@
-export PATH:=./node_modules/.bin/:$(PATH)
-
 SOURCE_FILES:=$(shell find src/ -type f -name '*.ts')
 
 .PHONY: build
@@ -12,35 +10,35 @@ clean:
 
 .PHONY: test
 test: lint test/httpwg-tests/list.json dist/build
-	nyc mocha
+	node_modules/.bin/nyc node_modules/.bin/mocha
 
 .PHONY: test-debug
 test-debug:
-	mocha --inspect-brk
+	node_modules/.bin/mocha --inspect-brk
 
 .PHONY: lint
 lint:
-	tslint -c tslint.json --project tsconfig.json 'src/**/*.ts' 'test/**/*.ts'
+	node_modules/.bin/eslint --quiet 'src/**/*.ts'
 
 .PHONY: fix
 fix:
-	tslint -c tslint.json --project tsconfig.json 'src/**/*.ts' 'test/**/*.ts' --fix
+	node_modules/.bin/eslint --quiet 'src/**/*.ts' --fix
 
 .PHONY: watch
 watch:
-	tsc --watch
+	node_modules/.bin/tsc --watch
 
 .PHONY: browserbuild
 browserbuild: dist/build
 	mkdir -p browser
-	webpack \
+	node_modules/.bin/webpack \
 		--optimize-minimize \
 		-p \
 		--display-modules \
 		--sort-modules-by size
 
 dist/build: $(SOURCE_FILES)
-	tsc
+	node_modules/.bin/tsc
 	@# A fake file to keep track of the last build time
 	touch dist/build
 

@@ -106,6 +106,7 @@ export default class Serializer {
 
   private serializeString(input: string): string {
 
+    /* eslint-disable-next-line no-control-regex */
     if (!/^[\x1F-\x7F]*$/.test(input)) {
       throw new Error('Strings must be in the ASCII range');
     }
