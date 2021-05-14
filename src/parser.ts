@@ -1,6 +1,27 @@
 import { Dictionary, List, Item, BareItem, Parameters, Token, InnerList, ByteSequence } from './types';
 
-class ParseError extends Error {
+export function parseDictionary(input: string): Dictionary {
+
+  const parser = new Parser(input);
+  return parser.parseDictionary();
+
+}
+
+export function parseList(input: string): List {
+
+  const parser = new Parser(input);
+  return parser.parseList();
+
+}
+
+export function parseItem(input: string): Item {
+
+  const parser = new Parser(input);
+  return parser.parseItem(true);
+
+}
+
+export class ParseError extends Error {
 
   constructor(position: number, message:string) {
 
@@ -399,9 +420,15 @@ export default class Parser {
 
 }
 
+
+
+
 const isDigitRegex = /^[0-9]$/;
 function isDigit(char: string): boolean {
 
   return isDigitRegex.test(char);
 
 }
+
+
+

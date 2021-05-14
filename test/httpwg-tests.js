@@ -85,9 +85,7 @@ function makeTest(test) {
           result = parser.parseList();
           break;
         case 'dictionary' :
-          result = [];
-          const tmpResult = parser.parseDictionary();
-          result = Array.from(tmpResult.entries());
+          result = parser.parseDictionary();
           break;
         default:
           throw new Error('Unsupported header type: ' + test.header_type);
@@ -131,13 +129,13 @@ function makeTest(test) {
 }
 
 /**
- * Fix values so they compare better
+ * Fix values so they compare better.
  *
+ * This function deeply changes the following:
  *
- * The HTTP-WG tests decode the "byte sequence" type as a Base32 string.
- *
- * We decode them in buffers. This function replaces all Buffers to base32
- * strings.
+ * * support __type from HTTPWG test suite
+ * * Convert Map to arrays.
+ * * Convert -0 to 0
  */
 function deepClean(input) {
 
