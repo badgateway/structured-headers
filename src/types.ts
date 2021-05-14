@@ -1,20 +1,67 @@
-export type Item = string | number | Buffer | boolean;
+/**
+ * Lists are arrays of zero or more members, each of which can be an Item
+ * or an Inner List, both of which can be Parameterized
+ */
+export type List = (InnerList|Item)[];
 
-export type Parameters = {
-  [key: string]: Item;
-};
+/**
+ * An Inner List is an array of zero or more Items. Both the individual Items
+ * and the Inner List itself can be Parameterized.
+ */
+export type InnerList = [Item[], Parameters];
 
-export type Dictionary = {
-  [key: string]: {
-    value: Item | Item[];
-    parameters?: Parameters;
-  };
-};
+/**
+ * Parameters are an ordered map of key-value pairs that are associated with
+ * an Item or Inner List. The keys are unique within the scope of the
+ * Parameters they occur within, and the values are bare items (i.e., they
+ * themselves cannot be parameterized
+ */
+export type Parameters = Map<string, Item>;
 
+/**
+ * Dictionaries are ordered maps of key-value pairs, where the keys are short
+ * textual strings and the values are Items or arrays of Items, both of which
+ * can be Parameterized.
+ *
+ * There can be zero or more members, and their keys are unique in the scope
+ * of the Dictionary they occur within.
+ */
+export type Dictionary = Map<string, Item|InnerList>;
 
-export type ListItem = {
-  value: Item | Item[];
-  parameters?: Parameters;
-};
+export class Token {
 
-export type List = ListItem[];
+  value: string;
+  constructor(value: string) {
+
+    this.value = value;
+
+  }
+
+  toString(): string {
+
+    return this.value;
+
+  }
+
+}
+
+export class ByteSequence {
+
+  base64Value: string;
+  constructor(base64Value: string) {
+
+    this.base64Value = base64Value;
+
+  }
+
+  toBase64(): string {
+
+    return this.base64Value;
+
+  }
+
+}
+
+export type BareItem = number | string | Token | ByteSequence | boolean;
+
+export type Item = [BareItem, Parameters];

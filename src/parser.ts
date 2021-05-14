@@ -1,359 +1,407 @@
-import { Dictionary, Item, List, ListItem, Parameters } from './types';
+import { Dictionary, List, Item, BareItem, Parameters, Token, InnerList, ByteSequence } from './types';
+
+class ParseError extends Error {
+
+  constructor(position: number, message:string) {
+
+    super(`Parse error: ${message} at offset ${position}`);
+
+  }
+
+}
 
 export default class Parser {
 
   input: string;
-  position: number;
+  pos: number;
 
   constructor(input: string) {
-
     this.input = input;
-    this.position = 0;
-    this.skipOWS();
-
+    this.pos = 0;
   }
 
   parseDictionary(): Dictionary {
 
-    const output: Dictionary = {};
+    this.skipWS();
+    const dictionary = new Map();
+    while(!this.eof()) {
 
-    while (!this.eol()) {
-
-      // Dictionary key
-      const key = this.parseKey();
-      if (output[key] !== undefined) {
-        throw new Error('Duplicate key in dictionary: ' + key);
+      const thisKey = this.parseKey();
+      let member;
+      if (this.lookChar()==='=') {
+        this.pos++;
+        member = this.parseItemOrInnerList();
+      } else {
+        member = [true, this.parseParameters()];
       }
-
-      // Equals sign
-      this.matchByte('=');
-
-      const value = this.parseParameterizedMember();
-      output[key] = value;
-
-      // Optional whitespace
+      dictionary.set(thisKey, member);
       this.skipOWS();
-
-      // Exit if at end of string
-      if (this.eol()) {
-        return output;
+      if (this.eof()) {
+        return dictionary;
       }
-
-      // Comma for separating values
-      this.matchByte(',');
-
-      // Optional whitespace
+      this.expectChar(',');
+      this.pos++;
       this.skipOWS();
-
-      if (this.eol()) {
-        throw new Error('Unexpected end of string');
+      if (this.eof()) {
+        throw new ParseError(this.pos, 'Dictionary contained a trailing comma');
       }
-
     }
-    return output;
+    return dictionary;
 
   }
 
   parseList(): List {
 
-    const output: List = [];
-    while (!this.eol()) {
-
-      output.push(this.parseParameterizedMember());
+    this.skipWS();
+    const members: List = [];
+    while(!this.eof()) {
+      members.push(
+        this.parseItemOrInnerList()
+      );
       this.skipOWS();
-      if (this.eol()) {
-        break;
+      if (this.eof()) {
+        return members;
       }
-      this.matchByte(',');
-
+      this.expectChar(',');
+      this.pos++;
       this.skipOWS();
-
-      if (this.eol()) {
-        throw new Error('Unexpected end of string. Was there a trailing comma?');
+      if (this.eof()) {
+        throw new ParseError(this.pos, 'A list may not end with a trailing comma');
       }
     }
 
-    return output;
+    return members;
 
   }
 
-  /**
-   * Parses a header as "item".
-   */
-  parseItem(): Item {
+  parseItem(standaloneItem: boolean = true): Item {
 
-    this.skipOWS();
-    const r = this.parseItemStr();
-    this.end();
-    return r;
+    if (standaloneItem) this.skipWS();
 
-  }
+    const result: Item = [
+      this.parseBareItem(),
+      this.parseParameters()
+    ];
 
-
-  private parseParameterizedMember(): ListItem {
-
-    let value;
-    if (this.input[this.position] === '(') {
-      value = this.parseInnerList();
-    } else {
-      value = this.parseItemStr();
-    }
-    const parameters: Parameters = {};
-
-    while (!this.eol()) {
-      this.skipOWS();
-      if (this.input[this.position] !== ';') {
-        break;
-      }
-      this.getByte();
-      this.skipOWS();
-      const paramKey = this.parseKey();
-      if (paramKey in parameters) {
-        throw new Error('Duplicate parameter key: ' + paramKey);
-      }
-      let paramValue = null;
-      if (this.input[this.position] === '=') {
-        this.getByte();
-        paramValue = this.parseItemStr();
-      }
-      parameters[paramKey] = paramValue;
-    }
-    return {
-      value,
-      parameters
-    };
-
-  }
-
-  private parseInnerList(): Item[] {
-
-    this.matchByte('(');
-    const result: Item[] = [];
-
-    while (!this.eol()) {
-
-      this.skipOWS();
-
-      if (this.input[this.position] === ')') {
-        this.getByte();
-        break;
-      }
-      result.push(this.parseItemStr());
-      if (this.input[this.position] !== ' ' && this.input[this.position] !== ')') {
-        throw new Error('Malformed list. Expected whitespace or )');
-      }
-    }
-
+    if (standaloneItem) this.checkTrail();
     return result;
 
   }
 
-  /**
-   * Parses an "item" part from a header.
-   *
-   * This function is used for parsing items that are a component of other
-   * headers.
-   *
-   * If you are parsing an entire header, which should only contain a single
-   * item, use parseItem() instead.
-   */
-  parseItemStr(): Item {
+  parseItemOrInnerList(): Item|InnerList {
 
-    const c = this.input[this.position];
-    if (c === '"') {
-      return this.parseString();
+    if (this.lookChar()==='(') {
+      return this.parseInnerList();
+    } else {
+      return this.parseItem(false);
     }
-    if (c === '*') {
-      return this.parseByteSequence();
-    }
-    if (c === '?') {
-      return this.parseBoolean();
-    }
-    if (c.match(/[0-9-]/)) {
-      return this.parseNumber();
-    }
-    if (c.match(/[a-zA-Z]/)) {
-      return this.parseToken();
-    }
-
-    throw new Error('Unexpected character: ' + c + ' on position ' + this.position);
 
   }
 
+  parseInnerList(): InnerList {
 
-  parseNumber(): number {
+    this.expectChar('(');
+    this.pos++;
 
-    const match = this.input.substr(
-      this.position
-    ).match(/[0-9-]([0-9])*(\.[0-9]{1,6})?/);
-    this.position += match[0].length;
-    if (match[0].indexOf('.') !== -1) {
-      return parseFloat(match[0]);
-    } else {
-      if (match[0].length > 16 || (match[0][0] !== '-' && match[0].length > 15)) {
-        throw Error('Integers must not have more than 15 digits.' + match[0].length);
+    const innerList: Item[] = [];
+
+    while(!this.eof()) {
+      this.skipWS();
+      if (this.lookChar() === ')') {
+        this.pos++;
+        return [
+          innerList,
+          this.parseParameters()
+        ];
       }
-      return parseInt(match[0], 10);
+
+      innerList.push(this.parseItem(false));
+
+      const nextChar = this.lookChar();
+      if (nextChar!==' ' && nextChar !== ')') {
+        throw new ParseError(this.pos, 'Expected a whitespace or ) after every item in an inner list');
+      }
+    }
+
+    throw new ParseError(this.pos, 'Could not find end of inner list');
+
+  }
+
+  parseBareItem(): BareItem {
+
+    const char = this.lookChar();
+    if (char.match(/^[-0-9]/)) {
+      return this.parseIntegerOrDecimal();
+    }
+    if (char === '"') {
+      return this.parseString();
+    }
+    if (char.match(/^[A-Za-z*]/)) {
+      return this.parseToken();
+    }
+    if (char === ':' ) {
+      return this.parseByteSequence();
+    }
+    if (char === '?') {
+      return this.parseBoolean();
+    }
+
+    throw new ParseError(this.pos, 'Unexpected input');
+
+  }
+
+  parseParameters(): Parameters {
+
+    const parameters = new Map();
+    while(!this.eof()) {
+      const char = this.lookChar();
+      if (char!==';') {
+        break;
+      }
+      this.pos++;
+      this.skipWS();
+      const key = this.parseKey();
+      let value: BareItem = true;
+      if (this.lookChar() === '=') {
+        this.pos++;
+        value = this.parseBareItem();
+      }
+      parameters.set(key, value);
+    }
+
+    return parameters;
+
+  }
+
+  parseIntegerOrDecimal(): number {
+
+    let type: 'integer' | 'decimal' = 'integer';
+    let sign = 1;
+    let inputNumber = '';
+    if (this.lookChar()==='-') {
+      sign = -1;
+      this.pos++;
+    }
+
+    if (this.eof()) {
+      throw new ParseError(this.pos, 'Empty integer');
+    }
+
+    if (!isDigit(this.lookChar())) {
+      throw new ParseError(this.pos, 'Expected a digit (0-9)');
+    }
+
+    while(!this.eof()) {
+      const char = this.getChar();
+      if (isDigit(char)) {
+        inputNumber+=char;
+      } else if (type === 'integer' && char === '.') {
+        if (inputNumber.length>12) {
+          throw new ParseError(this.pos, 'Exceeded maximum decimal length');
+        }
+        inputNumber+='.';
+        type = 'decimal';
+      } else {
+        // We need to 'prepend' the character, so it's just a rewind
+        this.pos--;
+        break;
+      }
+
+      if (type === 'integer' && inputNumber.length>15) {
+        throw new ParseError(this.pos, 'Exceeded maximum integer length');
+      }
+      if (type === 'decimal' && inputNumber.length>16) {
+        throw new ParseError(this.pos, 'Exceeded maximum decimal length');
+      }
+    }
+
+    if (type === 'integer') {
+      return parseInt(inputNumber, 10) * sign;
+    } else {
+      if (inputNumber.endsWith('.')) {
+        throw new ParseError(this.pos, 'Decimal cannot end on a period');
+      }
+      if (inputNumber.split('.')[1].length>3) {
+        throw new ParseError(this.pos, 'Number of digits after the decimal point cannot exceed 3');
+      }
+      return parseFloat(inputNumber) * sign;
     }
 
   }
 
   parseString(): string {
 
-    let output = '';
-    this.position++;
-    while (true) {
+    let outputString = '';
+    this.expectChar('"');
+    this.pos++;
 
-      const c = this.getByte();
-      switch (c) {
-
-        case '\\' : {
-          const c2 = this.getByte();
-          if (c2 !== '"' && c2 !== '\\') {
-            throw new Error('Expected a " or \\ on position: ' + (this.position - 1));
-          }
-          output += c2;
-          break;
+    while(!this.eof()) {
+      const char = this.getChar();
+      if (char==='\\') {
+        if (this.eof()) {
+          throw new ParseError(this.pos, 'Unexpected end of input');
         }
-        case '"' :
-          return output;
-        default :
-          if (c < ' ' || c > '~') {
-            throw new Error('Character outside of ASCII range');
-          }
-          output += c;
-          break;
+        const nextChar = this.getChar();
+        if (nextChar!=='\\' && nextChar !== '"') {
+          throw new ParseError(this.pos, 'A backslash must be followed by another backslash or double quote');
+        }
+        outputString+=nextChar;
+      } else if (char === '"') {
+        return outputString;
+      } else if (!/^[\x20-\x7E]$/.test(char)) { /* eslint-disable-line no-control-regex */
+        throw new Error('Strings must be in the ASCII range');
+      } else {
+        outputString += char;
       }
 
     }
+    throw new ParseError(this.pos, 'Unexpected end of input');
 
   }
 
-  /**
-   * Tokens are parsed as strings.
-   *
-   * They are a possible 'item'. If the string contains characters outside
-   * the token list, it should be enclosed in double-quotes and serialized
-   * as a 'string' instead of 'token'
-   */
-  parseToken(): string {
+  parseToken(): Token {
 
-    const identifierRegex = /^[a-zA-Z][a-zA-Z0-9_\-.:%*/]*/;
-    const result = this.input.substr(this.position).match(identifierRegex);
-    if (!result) {
-      throw Error('Expected identifier at position: ' + this.position);
+    if (!this.lookChar().match(/^[A-Za-z*]/)) {
+      throw new ParseError(this.pos, 'A token must begin with an asterisk or letter (A-Z, a-z)');
     }
-    this.position += result[0].length;
-    return result[0];
+
+    let outputString = '';
+
+    while(!this.eof()) {
+      const char = this.lookChar();
+      if (!/^[:/!#$%&'*+\-.^_`|~A-Za-z0-9]$/.test(char)) {
+        return new Token(outputString);
+      }
+      outputString += this.getChar();
+    }
+
+    return new Token(outputString);
 
   }
 
-  /**
-   * Keys are used both in Dictionary and ParamList.
-   */
-  parseKey(): string {
+  parseByteSequence(): ByteSequence {
 
-    const identifierRegex = /^[a-z][a-z0-9_\-*]{0,254}/;
-    const result = this.input.substr(this.position).match(identifierRegex);
-    if (!result) {
-      throw Error('Expected identifier at position: ' + this.position);
+    this.expectChar(':');
+    this.pos++;
+    const endPos = this.input.indexOf(':', this.pos);
+    if (endPos === -1) {
+      throw new ParseError(this.pos, 'Could not find a closing ":" character to mark end of Byte Sequence');
     }
-    this.position += result[0].length;
-    return result[0];
+    const b64Content = this.input.substring(this.pos, endPos);
+    this.pos += b64Content.length+1;
 
-  }
-
-  parseByteSequence(): Buffer {
-
-    this.matchByte('*');
-    const result = this.input.substr(this.position).match(/^([A-Za-z0-9\\+\\/=]*)\*/);
-    if (!result) {
-      throw new Error('Couldn\'t parse byte sequence');
+    if (!/^[A-Za-z0-9+/=]*$/.test(b64Content)) {
+      throw new ParseError(this.pos, 'ByteSequence does not contain a valid base64 string');
     }
-    if (result[1].length % 4 !== 0) {
-      throw new Error('Base64 strings should always have a length that\'s a multiple of 4. Did you forget padding?');
-    }
-    this.position += result[0].length;
 
-    return Buffer.from(result[1], 'base64');
+    return new ByteSequence(b64Content);
 
   }
 
   parseBoolean(): boolean {
 
-    this.matchByte('?');
-    const c = this.getByte();
-    let result;
-    switch (c) {
-      case '0' :
-        result = false;
-        break;
-      case '1' :
-        result = true;
-        break;
-      default:
-        throw new Error('A "?" must be followed by "0" or "1"');
-    }
+    this.expectChar('?');
+    this.pos++;
 
-    return result;
+    const char = this.getChar();
+    if (char === '1') {
+      return true;
+    }
+    if (char === '0') {
+      return false;
+    }
+    throw new ParseError(this.pos, 'Unexpected character. Expected a "1" or a "0"');
 
   }
 
+  parseKey(): string {
+
+    if (!this.lookChar().match(/^[a-z*]/)) {
+      throw new ParseError(this.pos, 'A key must begin with an asterisk or letter (a-z)');
+    }
+
+    let outputString = '';
+
+    while(!this.eof()) {
+      const char = this.lookChar();
+      if (!/^[a-z0-9_\-.*]$/.test(char)) {
+        return outputString;
+      }
+      outputString += this.getChar();
+    }
+
+    return outputString;
+
+  }
+
+  /**
+   * Looks at the next character without advancing the cursor.
+   */
+  private lookChar():string {
+
+    return this.input[this.pos];
+
+  }
+
+  /**
+   * Checks if the next character is 'char', and fail otherwise.
+   */
+  private expectChar(char: string): void {
+
+    if (this.lookChar()!==char) {
+      throw new ParseError(this.pos, `Expected ${char}`);
+    }
+
+  }
+
+  private getChar(): string {
+
+    return this.input[this.pos++];
+
+  }
+  private eof():boolean {
+
+    return this.pos>=this.input.length;
+
+  }
   // Advances the pointer to skip all whitespace.
-  skipOWS(): void {
+  private skipOWS(): void {
 
     while (true) {
-      const c = this.input.substr(this.position, 1);
+      const c = this.input.substr(this.pos, 1);
       if (c === ' ' || c === '\t') {
-        this.position++;
+        this.pos++;
       } else {
         break;
       }
     }
 
   }
+  // Advances the pointer to skip all spaces
+  private skipWS(): void {
 
-  // Eats up any whitespace and ensures that there's nothing left at the end
-  // of the string.
-  end(): void {
-
-    this.skipOWS();
-    if (!this.eol()) {
-      throw new Error('Expected end of the string, but found more data instead');
+    while(this.lookChar()===' ') {
+      this.pos++;
     }
 
   }
 
-  // Advances the pointer 1 position and returns a byte.
-  getByte(): string {
+  // At the end of parsing, we need to make sure there are no bytes after the
+  // header except whitespace.
+  private checkTrail(): void {
 
-    const c = this.input[this.position];
-    if (c === undefined) {
-      throw new Error('Unexpected end of string');
+    this.skipWS();
+    if (!this.eof()) {
+      throw new ParseError(this.pos, 'Unexpected characters at end of input');
     }
-    this.position++;
-    return c;
-
-  }
-
-  // Grabs 1 byte from the stream and makes sure it matches the specified
-  // character.
-  matchByte(match: string): void {
-
-    const c = this.getByte();
-    if (c !== match) {
-      throw new Error('Expected ' + match + ' on position ' + (this.position - 1));
-    }
-
-  }
-
-  // Returns true if we're at the end of the line.
-  eol(): boolean {
-
-    return this.position === this.input.length;
 
   }
 
 }
 
-module.exports = Parser;
+const isDigitRegex = /^[0-9]$/;
+function isDigit(char: string): boolean {
+
+  return isDigitRegex.test(char);
+
+}
