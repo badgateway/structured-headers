@@ -65,12 +65,6 @@ export class ByteSequence {
 
 }
 
-
-export type BooleanItem = {
-  type: 'byte-sequence';
-  value: boolean;
-}
-
-export type BareItem = number | string | Token | ByteSequence | BooleanItem;
+export type BareItem = number | string | Token | ByteSequence | boolean;
 
 export type Item = [BareItem, Parameters];

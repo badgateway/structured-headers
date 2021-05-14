@@ -8,7 +8,7 @@ describe('HTTP-WG tests', () => {
 
   const testGroups = [
     'binary',
-    //'boolean',
+    'boolean',
     'number',
     'string',
     'token',

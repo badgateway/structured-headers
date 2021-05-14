@@ -97,8 +97,11 @@ export default class Parser {
     if (char === ':' ) {
       return this.parseByteSequence();
     }
+    if (char === '?') {
+      return this.parseBoolean();
+    }
 
-    throw new Error('Not implemented');
+    throw new ParseError(this.pos, 'Unexpected input');
 
   }
 
@@ -240,6 +243,22 @@ export default class Parser {
     }
 
     return new ByteSequence(b64Content);
+
+  }
+
+  parseBoolean(): boolean {
+
+    this.expectChar('?');
+    this.pos++;
+
+    const char = this.getChar();
+    if (char === '1') {
+      return true;
+    }
+    if (char === '0') {
+      return false;
+    }
+    throw new ParseError(this.pos, 'Unexpected character. Expected a "1" or a "0"');
 
   }
 
