@@ -48,17 +48,29 @@ export class Token {
 
 }
 
-export type ByteSequenceItem = {
-  type: 'byte-sequence';
-  arrayBuffer: () => ArrayBuffer;
-  buffer: () => Buffer;
+export class ByteSequence {
+
+  base64Value: string;
+  constructor(base64Value: string) {
+
+    this.base64Value = base64Value;
+
+  }
+
+  toBase64(): string {
+
+    return this.base64Value;
+
+  }
+
 }
+
 
 export type BooleanItem = {
   type: 'byte-sequence';
   value: boolean;
 }
 
-export type BareItem = number | string | Token | ByteSequenceItem | BooleanItem;
+export type BareItem = number | string | Token | ByteSequence | BooleanItem;
 
 export type Item = [BareItem, Parameters];

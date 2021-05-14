@@ -1,13 +1,13 @@
 const expect = require('chai').expect;
 const Parser = require('../dist/parser').default;
-const { Token } = require('../dist/types');
+const { Token, ByteSequence } = require('../dist/types');
 const base32Encode = require('base32-encode');
 const fs = require('fs');
 
 describe('HTTP-WG tests', () => {
 
   const testGroups = [
-    //'binary',
+    'binary',
     //'boolean',
     'number',
     'string',
@@ -99,7 +99,7 @@ function makeTest(test) {
     }
 
     if (test.must_fail) {
-      expect(hadError).to.equal(true);
+      expect(hadError).to.equal(true, 'Parsing this should result in a failure');
     } else {
 
       if (hadError) {
@@ -142,14 +142,16 @@ function makeTest(test) {
  */
 function deepClean(input) {
 
-  if(input instanceof Buffer) {
-    return base32Encode(input, 'RFC4648');
-  }
-
   if(input instanceof Token) {
     return {
       __type: 'token',
       value: input.toString()
+    }
+  }
+  if (input instanceof ByteSequence) {
+    return {
+      __type: 'binary',
+      value: base32Encode(Buffer.from(input.toBase64(), 'base64'), 'RFC4648')
     }
   }
 

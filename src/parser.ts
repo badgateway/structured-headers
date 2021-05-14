@@ -1,4 +1,4 @@
-import { Dictionary, List, Item, BareItem, Parameters, Token, InnerList } from './types';
+import { Dictionary, List, Item, BareItem, Parameters, Token, InnerList, ByteSequence } from './types';
 
 class ParseError extends Error {
 
@@ -93,6 +93,9 @@ export default class Parser {
     }
     if (char.match(/^[A-Za-z*]/)) {
       return this.parseToken();
+    }
+    if (char === ':' ) {
+      return this.parseByteSequence();
     }
 
     throw new Error('Not implemented');
@@ -218,6 +221,25 @@ export default class Parser {
     }
 
     return new Token(outputString);
+
+  }
+
+  parseByteSequence(): ByteSequence {
+
+    this.expectChar(':');
+    this.pos++;
+    const endPos = this.input.indexOf(':', this.pos);
+    if (endPos === -1) {
+      throw new ParseError(this.pos, 'Could not find a closing ":" character to mark end of Byte Sequence');
+    }
+    const b64Content = this.input.substring(this.pos, endPos);
+    this.pos += b64Content.length+1;
+
+    if (!/^[A-Za-z0-9+/=]*$/.test(b64Content)) {
+      throw new ParseError(this.pos, 'ByteSequence does not contain a valid base64 string');
+    }
+
+    return new ByteSequence(b64Content);
 
   }
 
