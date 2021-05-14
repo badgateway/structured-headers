@@ -9,8 +9,8 @@ describe('HTTP-WG tests', () => {
     //'binary',
     //'boolean',
     'number',
-    //'string',
-    //'token',
+    'string',
+    'token',
 
     //'item',
 

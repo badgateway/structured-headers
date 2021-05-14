@@ -31,18 +31,22 @@ export type Parameters = Map<string, Item>;
  */
 export type Dictionary = Record<string, Item|InnerList>;
 
-export type StringItem = {
-  type: 'string';
-  value: string;
-}
+export class Token {
 
-export type TokenItem = {
-  type: 'token';
   value: string;
-}
+  constructor(value: string) {
 
-export type IntegerItem = number;
-export type DecimalItem = number;
+    this.value = value;
+
+  }
+
+  toString(): string {
+
+    return this.value;
+
+  }
+
+}
 
 export type ByteSequenceItem = {
   type: 'byte-sequence';
@@ -55,6 +59,6 @@ export type BooleanItem = {
   value: boolean;
 }
 
-export type BareItem = StringItem | IntegerItem | DecimalItem | TokenItem | ByteSequenceItem | BooleanItem;
+export type BareItem = number | string | Token | ByteSequenceItem | BooleanItem;
 
 export type Item = [BareItem, Parameters];

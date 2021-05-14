@@ -1,4 +1,4 @@
-import { Dictionary, List, Item, BareItem, Parameters, IntegerItem, DecimalItem } from './types';
+import { Dictionary, List, Item, BareItem, Parameters } from './types';
 
 class ParseError extends Error {
 
@@ -51,9 +51,12 @@ export default class Parser {
 
   parseBareItem(): BareItem {
 
-    const char = this.checkChar();
+    const char = this.lookChar();
     if (char.match(/^[-0-9]/)) {
       return this.parseIntegerOrDecimal();
+    }
+    if (char === '"') {
+      return this.parseString();
     }
 
     throw new Error('Not implemented');
@@ -64,7 +67,7 @@ export default class Parser {
 
     const parameters = new Map();
     while(!this.eof()) {
-      const char = this.checkChar();
+      const char = this.lookChar();
       if (char!==';') {
         break;
       }
@@ -76,12 +79,12 @@ export default class Parser {
 
   }
 
-  parseIntegerOrDecimal(): IntegerItem|DecimalItem {
+  parseIntegerOrDecimal(): number {
 
     let type: 'integer' | 'decimal' = 'integer';
     let sign = 1;
     let inputNumber = '';
-    if (this.checkChar()==='-') {
+    if (this.lookChar()==='-') {
       sign = -1;
       this.pos++;
     }
@@ -90,7 +93,7 @@ export default class Parser {
       throw new ParseError(this.pos, 'Empty integer');
     }
 
-    if (!isDigit(this.checkChar())) {
+    if (!isDigit(this.lookChar())) {
       throw new ParseError(this.pos, 'Expected a digit (0-9)');
     }
 
@@ -132,11 +135,56 @@ export default class Parser {
 
   }
 
-  private checkChar():string {
+  parseString(): string {
+
+    let outputString = '';
+    this.expectChar('"');
+    this.pos++;
+
+    while(!this.eof()) {
+      const char = this.getChar();
+      if (char==='\\') {
+        if (this.eof()) {
+          throw new ParseError(this.pos, 'Unexpected end of input');
+        }
+        const nextChar = this.getChar();
+        if (nextChar!=='\\' && nextChar !== '"') {
+          throw new ParseError(this.pos, 'A backslash must be followed by another backslash or double quote');
+        }
+        outputString+=nextChar;
+      } else if (char === '"') {
+        return outputString;
+      } else if (!/^[\x1F-\x7F]$/.test(char)) { /* eslint-disable-line no-control-regex */
+        throw new Error('Strings must be in the ASCII range');
+      } else {
+        outputString += char;
+      }
+
+    }
+    throw new ParseError(this.pos, 'Unexpected end of input');
+
+  }
+
+  /**
+   * Looks at the next character without advancing the cursor.
+   */
+  private lookChar():string {
 
     return this.input[this.pos];
 
   }
+
+  /**
+   * Checks if the next character is 'char', and fail otherwise.
+   */
+  private expectChar(char: string): void {
+
+    if (this.lookChar()!==char) {
+      throw new ParseError(this.pos, `Expected ${char}`);
+    }
+
+  }
+
   private getChar(): string {
 
     return this.input[this.pos++];
