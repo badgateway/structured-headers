@@ -8,10 +8,7 @@ export type List = (InnerList|Item)[];
  * An Inner List is an array of zero or more Items. Both the individual Items
  * and the Inner List itself can be Parameterized.
  */
-export type InnerList = {
-  param: Parameters;
-  items: Item[];
-}
+export type InnerList = [Item[], Parameters];
 
 /**
  * Parameters are an ordered map of key-value pairs that are associated with

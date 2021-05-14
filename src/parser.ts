@@ -49,19 +49,16 @@ export default class Parser {
 
   }
 
-  parseItem(standaloneItem: boolean): Item {
+  parseItem(standaloneItem: boolean = true): Item {
+
+    this.skipWS();
 
     const result: Item = [
       this.parseBareItem(),
       this.parseParameters()
     ];
 
-    // If the header is a standalone 'item', it means we're expecting no bytes
-    // after parsing.
-    if (!this.eof()) {
-      throw new ParseError(this.pos, 'Unexpected characters at end of item');
-    }
-
+    if (standaloneItem) this.checkTrail();
     return result;
 
   }
@@ -78,7 +75,30 @@ export default class Parser {
 
   parseInnerList(): InnerList {
 
-    throw new Error('Not implemented');
+    this.expectChar('(');
+    this.pos++;
+
+    const innerList: Item[] = [];
+
+    while(!this.eof()) {
+      this.skipWS();
+      if (this.lookChar() === ')') {
+        this.pos++;
+        return [
+          innerList,
+          this.parseParameters()
+        ];
+      }
+
+      innerList.push(this.parseItem(false));
+
+      const nextChar = this.lookChar();
+      if (nextChar!==' ' && nextChar !== ')') {
+        throw new ParseError(this.pos, 'Expected a whitespace or ) after every item in an inner list');
+      }
+    }
+
+    throw new ParseError(this.pos, 'Could not find end of inner list');
 
   }
 
@@ -302,6 +322,25 @@ export default class Parser {
       } else {
         break;
       }
+    }
+
+  }
+  // Advances the pointer to skip all spaces
+  private skipWS(): void {
+
+    while(this.lookChar()===' ') {
+      this.pos++;
+    }
+
+  }
+
+  // At the end of parsing, we need to make sure there are no bytes after the
+  // header except whitespace.
+  private checkTrail(): void {
+
+    this.skipWS();
+    if (!this.eof()) {
+      throw new ParseError(this.pos, 'Unexpected characters at end of input');
     }
 
   }

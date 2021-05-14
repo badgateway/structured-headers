@@ -13,17 +13,21 @@ describe('HTTP-WG tests', () => {
     'string',
     'token',
 
-    //'item',
+    'item',
 
-    //'list',
-    //'listlist',
-    //'dictionary',
-    //'param-list',
+    'list',
+    'listlist',
+    'dictionary',
+    'param-dict',
+    'param-list',
+    'param-listlist',
 
-    //'key-generated',
-    //'large-generated',
-    //'string-generated',
-    //'token-generated',
+    'examples',
+    'key-generated',
+    'large-generated',
+    'number-generated',
+    'string-generated',
+    'token-generated',
   ];
 
   for(const testGroup of testGroups) {
@@ -80,7 +84,16 @@ function makeTest(test) {
           break;
         case 'list' :
           result = parser.parseList();
-          result = result.map( item => [item[0], []] );
+          result = result.map( item => {
+            if (Array.isArray(item[0])) {
+              return [
+                item[0].map(innerItem => [innerItem[0], []]),
+                []
+              ];
+            } else {
+              return [item[0], []];
+            }
+          });
           break;
         case 'dictionary' :
           result = {};
