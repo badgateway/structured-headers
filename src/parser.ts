@@ -29,7 +29,7 @@ export function parseList(input: string): List {
 export function parseItem(input: string): Item {
 
   const parser = new Parser(input);
-  return parser.parseItem(true);
+  return parser.parseItem();
 
 }
 
@@ -121,7 +121,7 @@ export default class Parser {
 
   }
 
-  parseItemOrInnerList(): Item|InnerList {
+  private parseItemOrInnerList(): Item|InnerList {
 
     if (this.lookChar()==='(') {
       return this.parseInnerList();
@@ -131,7 +131,7 @@ export default class Parser {
 
   }
 
-  parseInnerList(): InnerList {
+  private parseInnerList(): InnerList {
 
     this.expectChar('(');
     this.pos++;
@@ -156,11 +156,12 @@ export default class Parser {
       }
     }
 
+
     throw new ParseError(this.pos, 'Could not find end of inner list');
 
   }
 
-  parseBareItem(): BareItem {
+  private parseBareItem(): BareItem {
 
     const char = this.lookChar();
     if (char.match(/^[-0-9]/)) {
@@ -183,7 +184,7 @@ export default class Parser {
 
   }
 
-  parseParameters(): Parameters {
+  private parseParameters(): Parameters {
 
     const parameters = new Map();
     while(!this.eof()) {
@@ -206,7 +207,7 @@ export default class Parser {
 
   }
 
-  parseIntegerOrDecimal(): number {
+  private parseIntegerOrDecimal(): number {
 
     let type: 'integer' | 'decimal' = 'integer';
     let sign = 1;
@@ -216,9 +217,10 @@ export default class Parser {
       this.pos++;
     }
 
-    if (this.eof()) {
-      throw new ParseError(this.pos, 'Empty integer');
-    }
+    // The spec wants this check but it's unreachable code.
+    //if (this.eof()) {
+    //  throw new ParseError(this.pos, 'Empty integer');
+    //}
 
     if (!isDigit(this.lookChar())) {
       throw new ParseError(this.pos, 'Expected a digit (0-9)');
@@ -262,7 +264,7 @@ export default class Parser {
 
   }
 
-  parseString(): string {
+  private parseString(): string {
 
     let outputString = '';
     this.expectChar('"');
@@ -292,11 +294,12 @@ export default class Parser {
 
   }
 
-  parseToken(): Token {
+  private parseToken(): Token {
 
-    if (!this.lookChar().match(/^[A-Za-z*]/)) {
-      throw new ParseError(this.pos, 'A token must begin with an asterisk or letter (A-Z, a-z)');
-    }
+    // The specification wants this check, but it's an unreachable code block.
+    // if (!/^[A-Za-z*]/.test(this.lookChar())) {
+    //  throw new ParseError(this.pos, 'A token must begin with an asterisk or letter (A-Z, a-z)');
+    //}
 
     let outputString = '';
 
@@ -312,7 +315,7 @@ export default class Parser {
 
   }
 
-  parseByteSequence(): ByteSequence {
+  private parseByteSequence(): ByteSequence {
 
     this.expectChar(':');
     this.pos++;
@@ -331,7 +334,7 @@ export default class Parser {
 
   }
 
-  parseBoolean(): boolean {
+  private parseBoolean(): boolean {
 
     this.expectChar('?');
     this.pos++;
@@ -347,7 +350,7 @@ export default class Parser {
 
   }
 
-  parseKey(): string {
+  private parseKey(): string {
 
     if (!this.lookChar().match(/^[a-z*]/)) {
       throw new ParseError(this.pos, 'A key must begin with an asterisk or letter (a-z)');
