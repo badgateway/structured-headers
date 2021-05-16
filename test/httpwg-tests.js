@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const Parser = require('../dist/parser').default;
+const parser = require('../dist/parser');
 const serializer = require('../dist/serializer');
 const { Token, ByteSequence } = require('../dist');
 const base32Encode = require('base32-encode');
@@ -30,6 +30,11 @@ describe('HTTP-WG tests', () => {
     'number-generated',
     'string-generated',
     'token-generated',
+
+    'serialisation-tests/key-generated',
+    'serialisation-tests/number',
+    'serialisation-tests/string-generated',
+    'serialisation-tests/token-generated',
   ];
 
   for(const testGroup of testGroups) {
@@ -68,7 +73,11 @@ function makeTestGroup(testGroup) {
 }
 function makeParseTest(test) {
 
-  const parser = new Parser(test.raw.join(','));
+  if (test.raw === undefined) {
+    // If there is no 'raw', it means that this is a serialization test.
+    return;
+  }
+  const input = test.raw.join(',');
 
   const skipped = [
     //'long integer',
@@ -91,13 +100,13 @@ function makeParseTest(test) {
     try {
       switch(test.header_type) {
         case 'item' :
-          result = parser.parseItem();
+          result = parser.parseItem(input);
           break;
         case 'list' :
-          result = parser.parseList();
+          result = parser.parseList(input);
           break;
         case 'dictionary' :
-          result = parser.parseDictionary();
+          result = parser.parseDictionary(input);
           break;
         default:
           throw new Error('Unsupported header type: ' + test.header_type);
@@ -149,12 +158,19 @@ function makeSerializeTest(test) {
     'single item parameterised list',
     'missing parameter value parameterised list',
     'missing terminal parameter value parameterised list',
+
+    // Structured headers dictates that rounding should go towards the nearest
+    // even number if the distance is identical.
+    // This has not been implemented yet.
+    'round positive even decimal - serialize',
+    'round negative even decimal - serialize',
+    'decimal round up to integer part - serialize',
   ];
 
   if (!test.expected) {
     // There is no expected output for parsing, which means that this was
     // a parse test for an invalid string.
-    // 
+    //
     // We just silently skip these.
     return;
   }
@@ -169,8 +185,12 @@ function makeSerializeTest(test) {
 
     // Since we do the opposite of the httpwg test, expected and input are
     // basically swapped.
-    
-    const expected = (test.canonical || test.raw).join(',');
+    let expected;
+    if (test.must_fail) {
+      expected = null;
+    } else {
+      expected = (test.canonical || test.raw).join(',');
+    }
     const input = test.expected;
 
     let hadError = false;
