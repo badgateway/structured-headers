@@ -1,6 +1,39 @@
-import { Dictionary, List, Item, BareItem, Parameters, Token, InnerList, ByteSequence } from './types';
+import {
+  Dictionary,
+  List,
+  Item,
+  BareItem,
+  Parameters,
+  InnerList,
+  ByteSequence
+} from './types';
 
-class ParseError extends Error {
+import { Token } from './token';
+
+import { isAscii } from './util';
+
+export function parseDictionary(input: string): Dictionary {
+
+  const parser = new Parser(input);
+  return parser.parseDictionary();
+
+}
+
+export function parseList(input: string): List {
+
+  const parser = new Parser(input);
+  return parser.parseList();
+
+}
+
+export function parseItem(input: string): Item {
+
+  const parser = new Parser(input);
+  return parser.parseItem(true);
+
+}
+
+export class ParseError extends Error {
 
   constructor(position: number, message:string) {
 
@@ -248,7 +281,7 @@ export default class Parser {
         outputString+=nextChar;
       } else if (char === '"') {
         return outputString;
-      } else if (!/^[\x20-\x7E]$/.test(char)) { /* eslint-disable-line no-control-regex */
+      } else if (!isAscii(char)) {
         throw new Error('Strings must be in the ASCII range');
       } else {
         outputString += char;

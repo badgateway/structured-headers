@@ -1,7 +1,9 @@
 const expect = require('chai').expect;
 const Parser = require('../dist/parser').default;
-const { Token, ByteSequence } = require('../dist/types');
+const serializer = require('../dist/serializer');
+const { Token, ByteSequence } = require('../dist');
 const base32Encode = require('base32-encode');
+const base32Decode = require('base32-decode');
 const fs = require('fs');
 
 describe('HTTP-WG tests', () => {
@@ -40,7 +42,6 @@ describe('HTTP-WG tests', () => {
 
   }
 
-
 });
 
 function makeTestGroup(testGroup) {
@@ -49,12 +50,23 @@ function makeTestGroup(testGroup) {
   const blob = fs.readFileSync(__dirname + '/httpwg-tests/' + fileName);
   const tests = JSON.parse(blob);
 
-  for(const test of tests) {
-    makeTest(test);
-  }
+  describe('Parsing', () => {
+
+    for(const test of tests) {
+      makeParseTest(test);
+    }
+
+  });
+  describe('Serializing', () => {
+
+    for(const test of tests) {
+      makeSerializeTest(test);
+    }
+
+  });
 
 }
-function makeTest(test) {
+function makeParseTest(test) {
 
   const parser = new Parser(test.raw.join(','));
 
@@ -63,7 +75,7 @@ function makeTest(test) {
     //'long negative integer',
   ];
 
-  it(test.name, function() {
+  it(`should parse: ${test.name}`, function() {
 
     if (skipped.includes(test.name)) {
       // Not yet supporting this.
@@ -85,9 +97,7 @@ function makeTest(test) {
           result = parser.parseList();
           break;
         case 'dictionary' :
-          result = [];
-          const tmpResult = parser.parseDictionary();
-          result = Array.from(tmpResult.entries());
+          result = parser.parseDictionary();
           break;
         default:
           throw new Error('Unsupported header type: ' + test.header_type);
@@ -112,7 +122,7 @@ function makeTest(test) {
         }
       }
 
-      result = deepClean(result);
+      result = packTestValue(result);
 
       try {
         expect(result).to.deep.equal(expected);
@@ -129,17 +139,104 @@ function makeTest(test) {
   });
 
 }
+function makeSerializeTest(test) {
+
+  const skipped = [
+    // We can't differentiate "1.0" from "1", so our output is different =(
+    'single item parameterised dict',
+    'list item parameterised dict',
+    'list item parameterised dictionary',
+    'single item parameterised list',
+    'missing parameter value parameterised list',
+    'missing terminal parameter value parameterised list',
+  ];
+
+  if (!test.expected) {
+    // There is no expected output for parsing, which means that this was
+    // a parse test for an invalid string.
+    // 
+    // We just silently skip these.
+    return;
+  }
+
+  it(`should serialize: ${test.name}`, function() {
+
+    if (skipped.includes(test.name) || test.name.endsWith('0 decimal')) {
+      // Not yet supporting this.
+      // see: https://github.com/httpwg/structured-header-tests/issues/9
+      this.skip('Can\'t support this yet');
+    }
+
+    // Since we do the opposite of the httpwg test, expected and input are
+    // basically swapped.
+    
+    const expected = (test.canonical || test.raw).join(',');
+    const input = test.expected;
+
+    let hadError = false;
+    let caughtError;
+    let output;
+
+    try {
+      switch(test.header_type) {
+        case 'item' :
+          output = serializer.serializeItem(unpackTestValue(input));
+          break;
+        case 'list' :
+          output = serializer.serializeList(unpackTestValue(input));
+          break;
+        case 'dictionary' :
+          output = serializer.serializeDictionary(unpackDictionary(input));
+          break;
+        default:
+          throw new Error('Unsupported header type: ' + test.header_type);
+      }
+    } catch (e) {
+      hadError = true;
+      caughtError = e;
+    }
+
+    if (test.must_fail) {
+      expect(hadError).to.equal(true, 'Parsing this should result in a failure');
+    } else {
+
+      if (hadError) {
+        // There was an error
+        if (test.can_fail) {
+          // Failure is OK
+          expect(hadError).to.equal(true);
+        } else {
+          // Failure is NOT OK
+          throw new Error('We should not have failed but got an error: ' + caughtError.message);
+        }
+      }
+
+      try {
+        expect(output).to.deep.equal(expected);
+      } catch (e) {
+        if (test.can_fail) {
+          // Optional failure
+          this.skip('can_fail was true');
+        } else {
+          throw e;
+        }
+      }
+
+    }
+  });
+
+}
 
 /**
- * Fix values so they compare better
+ * Fix values so they compare better.
  *
+ * This function deeply changes the following:
  *
- * The HTTP-WG tests decode the "byte sequence" type as a Base32 string.
- *
- * We decode them in buffers. This function replaces all Buffers to base32
- * strings.
+ * * support __type from HTTPWG test suite
+ * * Convert Map to arrays.
+ * * Convert -0 to 0
  */
-function deepClean(input) {
+function packTestValue(input) {
 
   if(input instanceof Token) {
     return {
@@ -155,12 +252,12 @@ function deepClean(input) {
   }
   if (input instanceof Map) {
     return Array.from(input.entries()).map( ([key, value]) => {
-      return [key, deepClean(value)];
+      return [key, packTestValue(value)];
     });
   }
 
   if (Array.isArray(input)) {
-    return input.map( item => deepClean(item));
+    return input.map( item => packTestValue(item));
   }
 
   if (input === null) {
@@ -174,11 +271,38 @@ function deepClean(input) {
   if (typeof input === 'object') {
 
     for(const [prop, value] of Object.entries(input)) {
-      input[prop] = deepClean(value);
+      input[prop] = packTestValue(value);
     }
 
   }
 
   return input;
+
+}
+
+/**
+ * This does the opposite of 'packTestValue', it turns values from the JSON test
+ * cases into values that the package expects
+ */
+function unpackTestValue(input) {
+
+  if (input.__type === 'token') {
+    return new Token(input.value);
+  }
+  if (input.__type === 'binary') {
+    return new ByteSequence(Buffer.from(base32Decode(input.value, 'RFC4648')).toString('base64'));
+  }
+  if (Array.isArray(input)) {
+    return input.map(unpackTestValue);
+  }
+  return input;
+
+}
+
+function unpackDictionary(input) {
+
+  return new Map(
+    input.map(([key, value]) => [key, unpackTestValue(value)])
+  );
 
 }
