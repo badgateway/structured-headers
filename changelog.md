@@ -60,7 +60,7 @@ ChangeLog
 * First version!
 * Parses all of the [04 draft of the specification][1].
 
-[1]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-04#section-4.2
+[1]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-04
 [2]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-09
 [3]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-10
 [4]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-13
