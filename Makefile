@@ -31,11 +31,7 @@ watch:
 .PHONY: browserbuild
 browserbuild: dist/build
 	mkdir -p browser
-	node_modules/.bin/webpack \
-		--optimize-minimize \
-		-p \
-		--display-modules \
-		--sort-modules-by size
+	node_modules/.bin/webpack --mode production
 
 dist/build: $(SOURCE_FILES)
 	node_modules/.bin/tsc
