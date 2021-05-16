@@ -14,7 +14,7 @@ ChangeLog
 0.3.0 (2019-10-03)
 ------------------
 
-* Fully up to date with [draft-ietf-httpbis-header-structure-13][3].
+* Fully up to date with [draft-ietf-httpbis-header-structure-13][4].
 * Parameterized Lists and List of Lists are gone, their feautures are merged
   into List and Dictionaries.
 * Both lists and dictionaries now require an object such as
