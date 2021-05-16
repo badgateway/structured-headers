@@ -1,7 +1,7 @@
 {
   "name": "structured-headers",
   "version": "0.4.0",
-  "description": "Implementation of draft-ietf-httpbis-header-structure, structured headers for HTTP.",
+  "description": "Implementation of RFC8941, structured headers for HTTP.",
   "main": "index.js",
   "scripts": {
     "test": "make test",
