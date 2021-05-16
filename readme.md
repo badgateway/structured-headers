@@ -11,6 +11,35 @@ booleans, and binary data.
 The library is written in Typescript, and the examples in this document are
 too, but plain Javascript is also fully supported.
 
+Compatibility
+-------------
+
+This package has 2725 unittests, the vast majority are supplied from the
+official [HTTP WG test suite][2].
+
+However, there are 2 differences in the serializer:
+
+1. Javascript can't differentiate between `1.0` and `1`. As a result we're
+   skipping the tests that require a serialiation output of `1.0`.
+2. Javascript rounds slightly different from the spec. The tests suggest that
+   `0.0025` should round to the nearest event number (`0.002`), but Javascript
+   rounds to `0.003`.
+
+No fix is planned for #1, because there's no reasonably way to fix this
+without wrapping every number in a custom class, and this will negatively
+impact the developer experience. We do intend to fix #2 in the future with a
+custom rounding algorithm.
+
+This library emits and expects the _exact_ data structures as they are
+suggested by the RFC. The result of this is that the returned types can be
+a bit complex.
+
+In the future we intend to loosen the required types for the serializer, and
+add new helper functions that give you simpler structures _if_ you don't need
+certain features for a header (such as `Parameters`).
+
+Let us know what you would like to see here!
+
 Installation
 ------------
 
@@ -201,3 +230,4 @@ of the api.
 
 
 [1]: https://datatracker.ietf.org/doc/html/rfc8941
+[2]: https://github.com/httpwg/structured-field-tests

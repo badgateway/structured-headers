@@ -1,6 +1,16 @@
 ChangeLog
 =========
 
+0.4.0 (2021-05-15)
+------------------
+
+* Fully up to date with [RFC8941][5].
+* This is a complete rewrite, all APIs have changed and return the structures
+  that are recommended by the actual RFC document.
+* Passing almost all tests from the [HTTP WG test suite][6]. See the readme
+  for the exceptions.
+
+
 0.3.0 (2019-10-03)
 ------------------
 
@@ -54,3 +64,5 @@ ChangeLog
 [2]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-09
 [3]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-10
 [4]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-13
+[5]: https://datatracker.ietf.org/doc/html/rfc8941
+[6]: https://github.com/httpwg/structured-field-tests

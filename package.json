@@ -14,7 +14,9 @@
   },
   "keywords": [
     "http",
-    "structured-header"
+    "structured-header",
+    "RFC8941",
+    "headers"
   ],
   "author": "Evert Pot <me@evertpot.com>",
   "license": "MIT",
