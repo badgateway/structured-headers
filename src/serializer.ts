@@ -10,7 +10,7 @@ import {
 
 import { Token } from './token';
 
-import { isAscii, isInnerList } from './util';
+import { isAscii, isInnerList, isValidKeyStr } from './util';
 
 export class SerializeError extends Error {}
 
@@ -58,7 +58,9 @@ export function serializeItem(input: Item): string {
 }
 
 function serializeInnerList(input: InnerList): string {
-  throw new Error('Not implemented: innerlist');
+
+  return `(${input[0].map(value => serializeItem(value)).join(' ')})${serializeParameters(input[1])}`;
+
 }
 
 
@@ -136,5 +138,10 @@ function serializeParameters(input: Parameters): string {
 }
 
 function serializeKey(input: string): string {
-  throw new Error('Not implemented: key');
+
+  if (!isValidKeyStr(input)) {
+    throw new SerializeError('Keys in dictionaries must only contain lowercase letter, numbers, _-*. and must start with a letter or *');
+  }
+  return input;
+
 }
