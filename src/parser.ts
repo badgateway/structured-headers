@@ -1,4 +1,16 @@
-import { Dictionary, List, Item, BareItem, Parameters, Token, InnerList, ByteSequence } from './types';
+import {
+  Dictionary,
+  List,
+  Item,
+  BareItem,
+  Parameters,
+  InnerList,
+  ByteSequence
+} from './types';
+
+import { Token } from './token';
+
+import { isAscii } from './util';
 
 export function parseDictionary(input: string): Dictionary {
 
@@ -269,7 +281,7 @@ export default class Parser {
         outputString+=nextChar;
       } else if (char === '"') {
         return outputString;
-      } else if (!/^[\x20-\x7E]$/.test(char)) { /* eslint-disable-line no-control-regex */
+      } else if (!isAscii(char)) {
         throw new Error('Strings must be in the ASCII range');
       } else {
         outputString += char;
@@ -420,15 +432,9 @@ export default class Parser {
 
 }
 
-
-
-
 const isDigitRegex = /^[0-9]$/;
 function isDigit(char: string): boolean {
 
   return isDigitRegex.test(char);
 
 }
-
-
-

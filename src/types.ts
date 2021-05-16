@@ -1,3 +1,5 @@
+import { Token } from './token';
+
 /**
  * Lists are arrays of zero or more members, each of which can be an Item
  * or an Inner List, both of which can be Parameterized
@@ -16,7 +18,7 @@ export type InnerList = [Item[], Parameters];
  * Parameters they occur within, and the values are bare items (i.e., they
  * themselves cannot be parameterized
  */
-export type Parameters = Map<string, Item>;
+export type Parameters = Map<string, BareItem>;
 
 /**
  * Dictionaries are ordered maps of key-value pairs, where the keys are short
@@ -27,23 +29,6 @@ export type Parameters = Map<string, Item>;
  * of the Dictionary they occur within.
  */
 export type Dictionary = Map<string, Item|InnerList>;
-
-export class Token {
-
-  value: string;
-  constructor(value: string) {
-
-    this.value = value;
-
-  }
-
-  toString(): string {
-
-    return this.value;
-
-  }
-
-}
 
 export class ByteSequence {
 
