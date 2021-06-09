@@ -1,6 +1,12 @@
 ChangeLog
 =========
 
+0.4.1 (2021-06-09)
+------------------
+
+* Corrected the 'main' property in `package.json`.
+
+
 0.4.0 (2021-05-15)
 ------------------
 
