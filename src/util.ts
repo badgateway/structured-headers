@@ -31,5 +31,5 @@ export function isInnerList(input: Item | InnerList): input is InnerList {
 
 
 export function isByteSequence(input: BareItem): input is ByteSequence {
-    return typeof input === 'object' && 'base64Value' in input
+  return typeof input === 'object' && 'base64Value' in input;
 }
