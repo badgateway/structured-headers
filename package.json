@@ -1,6 +1,6 @@
 {
   "name": "structured-headers",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Implementation of RFC8941, structured headers for HTTP.",
   "main": "dist/index.js",
   "scripts": {
