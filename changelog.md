@@ -1,6 +1,14 @@
 ChangeLog
 =========
 
+0.5.0 (2022-09-13)
+------------------
+
+* All the serializer functions are now exported. (@adrianhopebailie)
+* Added an `isByteSequence` helper function (@adrianhopebailie)
+* Bring all dependencies up to date.
+
+
 0.4.1 (2021-06-09)
 ------------------
 
