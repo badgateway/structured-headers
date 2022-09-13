@@ -1,4 +1,4 @@
-import { Item, InnerList } from './types';
+import { Item, InnerList, BareItem, ByteSequence } from './types';
 
 const asciiRe = /^[\x20-\x7E]*$/;
 const tokenRe = /^[a-zA-Z*][:/!#$%&'*+\-.^_`|~A-Za-z0-9]*$/;
@@ -26,5 +26,12 @@ export function isValidKeyStr(str: string): boolean {
 export function isInnerList(input: Item | InnerList): input is InnerList {
 
   return Array.isArray(input[0]);
+
+}
+
+
+export function isByteSequence(input: BareItem): input is ByteSequence {
+
+  return typeof input === 'object' && 'base64Value' in input;
 
 }

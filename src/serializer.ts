@@ -57,14 +57,14 @@ export function serializeItem(input: Item): string {
 
 }
 
-function serializeInnerList(input: InnerList): string {
+export function serializeInnerList(input: InnerList): string {
 
   return `(${input[0].map(value => serializeItem(value)).join(' ')})${serializeParameters(input[1])}`;
 
 }
 
 
-function serializeBareItem(input: BareItem): string {
+export function serializeBareItem(input: BareItem): string {
   if (typeof input === 'number') {
     if (Number.isInteger(input)) {
       return serializeInteger(input);
@@ -86,7 +86,7 @@ function serializeBareItem(input: BareItem): string {
   throw new SerializeError(`Cannot serialize values of type ${typeof input}`);
 }
 
-function serializeInteger(input: number): string {
+export function serializeInteger(input: number): string {
 
   if (input < -999_999_999_999_999 || input > 999_999_999_999_999) {
     throw new SerializeError('Structured headers can only encode integers in the range range of -999,999,999,999,999 to 999,999,999,999,999 inclusive');
@@ -94,7 +94,7 @@ function serializeInteger(input: number): string {
   return input.toString();
 }
 
-function serializeDecimal(input: number): string {
+export function serializeDecimal(input: number): string {
   const out = input.toFixed(3).replace(/0+$/,'');
   const signifantDigits = out.split('.')[0].replace('-','').length;
 
@@ -104,26 +104,26 @@ function serializeDecimal(input: number): string {
   return out;
 }
 
-function serializeString(input: string): string {
+export function serializeString(input: string): string {
   if (!isAscii(input)) {
     throw new SerializeError('Only ASCII strings may be serialized');
   }
   return `"${input.replace(/("|\\)/g, (v) => '\\' + v)}"`;
 }
 
-function serializeBoolean(input: boolean): string {
+export function serializeBoolean(input: boolean): string {
   return input ? '?1' : '?0';
 }
 
-function serializeByteSequence(input: ByteSequence): string {
+export function serializeByteSequence(input: ByteSequence): string {
   return `:${input.toBase64()}:`;
 }
 
-function serializeToken(input: Token): string {
+export function serializeToken(input: Token): string {
   return input.toString();
 }
 
-function serializeParameters(input: Parameters): string {
+export function serializeParameters(input: Parameters): string {
 
   return Array.from(input).map(([key, value]) => {
 
@@ -137,7 +137,7 @@ function serializeParameters(input: Parameters): string {
 
 }
 
-function serializeKey(input: string): string {
+export function serializeKey(input: string): string {
 
   if (!isValidKeyStr(input)) {
     throw new SerializeError('Keys in dictionaries must only contain lowercase letter, numbers, _-*. and must start with a letter or *');
