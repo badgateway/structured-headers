@@ -6,6 +6,7 @@ ChangeLog
 
 * This is mainly a re-release of 0.5.0. The package is stable and dependencies
   have been updated.
+* Dropped support for Node 12. The minimum Node version is now 14.
 
 
 0.5.0 (2022-09-13)
