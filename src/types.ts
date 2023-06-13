@@ -47,6 +47,6 @@ export class ByteSequence {
 
 }
 
-export type BareItem = number | string | Token | ByteSequence | boolean;
+export type BareItem = number | string | Token | ByteSequence | Date | boolean;
 
 export type Item = [BareItem, Parameters];
