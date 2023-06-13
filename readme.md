@@ -79,6 +79,9 @@ Header: :RE0gbWUgZm9yIGEgZnJlZSBjb29raWU=:
 
 # Items can have parameters
 Header: "Hello world"; a="5"
+
+# Parsed into a Date object
+Header: @1686634251
 ```
 
 
@@ -219,6 +222,9 @@ serializeItem([true, new Map()]);
 
 // Returns a base-64 representation like: *aGVsbG8=*
 serializeItem([new ByteSequence('aGVsbG8='), new Map()]);
+
+// Returns a unix timestamp
+serializeItem([new Date(), new Map()]);
 ```
 
 Browser support
