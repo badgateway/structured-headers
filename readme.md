@@ -14,7 +14,7 @@ too, but plain Javascript is also fully supported.
 Compatibility
 -------------
 
-This package has 2725 unittests, the vast majority are supplied from the
+This package has 2740 unittests, the vast majority are supplied from the
 official [HTTP WG test suite][2].
 
 However, there are 2 differences in the serializer:

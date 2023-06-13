@@ -179,7 +179,9 @@ export default class Parser {
     if (char === '?') {
       return this.parseBoolean();
     }
-
+    if (char === '@') {
+      return this.parseDate();
+    }
     throw new ParseError(this.pos, 'Unexpected input');
 
   }
@@ -347,6 +349,34 @@ export default class Parser {
       return false;
     }
     throw new ParseError(this.pos, 'Unexpected character. Expected a "1" or a "0"');
+
+  }
+
+  private parseDate(): Date {
+
+    this.expectChar('@');
+    this.pos++;
+    let sign = 1;
+    let inputNumber = '';
+    if (this.lookChar()==='-') {
+      sign = -1;
+      this.pos++;
+    }
+
+    if (!isDigit(this.lookChar())) {
+      throw new ParseError(this.pos, 'Expected a digit (0-9)');
+    }
+
+    while(!this.eof()) {
+      const char = this.getChar();
+      if (isDigit(char)) {
+        inputNumber+=char;
+      } else {
+        throw new ParseError(this.pos, 'Expected a digit (0-9), whitespace or EOL');
+      }
+    }
+
+    return new Date(parseInt(inputNumber,10)*sign*1000);
 
   }
 

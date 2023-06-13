@@ -80,6 +80,9 @@ export function serializeBareItem(input: BareItem): string {
   if (input instanceof ByteSequence) {
     return serializeByteSequence(input);
   }
+  if (input instanceof Date) {
+    return serializeDate(input);
+  }
   if (typeof input === 'boolean') {
     return serializeBoolean(input);
   }
@@ -121,6 +124,10 @@ export function serializeByteSequence(input: ByteSequence): string {
 
 export function serializeToken(input: Token): string {
   return input.toString();
+}
+
+export function serializeDate(input: Date): string {
+  return '@' + Math.floor(input.getTime()/1000);
 }
 
 export function serializeParameters(input: Parameters): string {

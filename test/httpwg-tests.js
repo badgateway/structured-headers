@@ -14,6 +14,7 @@ describe('HTTP-WG tests', () => {
     'number',
     'string',
     'token',
+    'date',
 
     'item',
 
@@ -270,6 +271,12 @@ function packTestValue(input) {
       value: base32Encode(Buffer.from(input.toBase64(), 'base64'), 'RFC4648')
     }
   }
+  if (input instanceof Date) {
+    return {
+      __type: 'date',
+      value: Math.floor(input.getTime()/1000)
+    };
+  }
   if (input instanceof Map) {
     return Array.from(input.entries()).map( ([key, value]) => {
       return [key, packTestValue(value)];
@@ -306,11 +313,17 @@ function packTestValue(input) {
  */
 function unpackTestValue(input) {
 
-  if (input.__type === 'token') {
-    return new Token(input.value);
-  }
-  if (input.__type === 'binary') {
-    return new ByteSequence(Buffer.from(base32Decode(input.value, 'RFC4648')).toString('base64'));
+  if (input.__type) {
+    switch(input.__type) {
+      case 'token' :
+        return new Token(input.value);
+      case 'binary':
+        return new ByteSequence(Buffer.from(base32Decode(input.value, 'RFC4648')).toString('base64'));
+      case 'date' :
+        return new Date(input.value * 1000);
+      default:
+        throw new Error('Unknown input __type: ' + input.__type);
+    }
   }
   if (Array.isArray(input)) {
     return input.map(unpackTestValue);
