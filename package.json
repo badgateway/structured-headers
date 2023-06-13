@@ -71,5 +71,9 @@
     "last 2 versions",
     "not ie 11",
     "not op_mini all"
-  ]
+  ],
+  "engines": {
+    "npm": ">=6",
+    "node": ">= 12"
+  }
 }
