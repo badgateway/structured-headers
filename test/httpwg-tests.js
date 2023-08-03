@@ -118,13 +118,13 @@ function makeParseTest(test) {
 
     if (test.must_fail) {
       expect(hadError).to.equal(true, 'Parsing this should result in a failure');
+      expect(caughtError instanceof ParseError).to.equal(true);
     } else {
 
       if (hadError) {
-        // There was an error
+
         if (test.can_fail) {
-          // Failure is OK
-          expect(hadError).to.equal(true);
+          expect(caughtError instanceof ParseError).to.equal(true);
         } else {
           // Failure is NOT OK
           throw new Error('We should not have failed but got an error: ' + caughtError.message);
@@ -223,6 +223,7 @@ function makeSerializeTest(test) {
       if (hadError) {
         // There was an error
         if (test.can_fail) {
+
           // Failure is OK
           expect(hadError).to.equal(true);
         } else {
@@ -234,9 +235,7 @@ function makeSerializeTest(test) {
       try {
         expect(output).to.deep.equal(expected);
       } catch (e) {
-        if (e instanceof TypeError) {
-          throw new Error('Test emitted a TypeError, but we should only emit ParseErrors', { cause: e });
-        }
+
         if (test.can_fail) {
           // Optional failure
           this.skip('can_fail was true');
