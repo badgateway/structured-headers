@@ -1,6 +1,6 @@
 {
   "name": "structured-headers",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Implementation of RFC8941, structured headers for HTTP.",
   "main": "dist/index.js",
   "scripts": {
@@ -37,8 +37,8 @@
     "@types/chai": "^4.3.3",
     "@types/mocha": "^10.0.1",
     "@types/node": "^12.20.13",
-    "@typescript-eslint/eslint-plugin": "^5.36.2",
-    "@typescript-eslint/parser": "^5.36.2",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
     "base32-decode": "^1.0.0",
     "base32-encode": "^1.1.1",
     "chai": "^4.2.0",

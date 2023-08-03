@@ -7,7 +7,7 @@ ChangeLog
 * Support for a new 'Date' type, from draft [draft-ietf-httpbis-sfbis-02][7].
 
 
-1.0.1 (????-??-??)
+1.0.1 (2023-08-03)
 ------------------
 
 * This library emitted `TypeError` or a plain `Error` in a few places in the
