@@ -234,6 +234,9 @@ function makeSerializeTest(test) {
       try {
         expect(output).to.deep.equal(expected);
       } catch (e) {
+        if (e instanceof TypeError) {
+          throw new Error('Test emitted a TypeError, but we should only emit ParseErrors', { cause: e });
+        }
         if (test.can_fail) {
           // Optional failure
           this.skip('can_fail was true');
