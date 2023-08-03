@@ -1,6 +1,14 @@
 ChangeLog
 =========
 
+1.0.1 (????-??-??)
+------------------
+
+* This library emitted `TypeError` or a plain `Error` in a few places in the
+  parser, where it should have been `ParseError` this is corrected everywhere
+  now.
+
+
 1.0.0 (2023-06-13)
 ------------------
 
@@ -84,9 +92,9 @@ ChangeLog
 * First version!
 * Parses all of the [04 draft of the specification][1].
 
-[1]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-04 [2]:
-https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-09 [3]:
-https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-10 [4]:
-https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-13 [5]:
-https://datatracker.ietf.org/doc/html/rfc8941 [6]:
-https://github.com/httpwg/structured-field-tests
+[1]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-04
+[2]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-09
+[3]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-10
+[4]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-13
+[5]: https://datatracker.ietf.org/doc/html/rfc8941
+[6]: https://github.com/httpwg/structured-field-tests
