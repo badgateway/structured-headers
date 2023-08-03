@@ -1,6 +1,15 @@
 const expect = require('chai').expect;
-const parser = require('../dist/parser');
-const serializer = require('../dist/serializer');
+const {
+  parseItem,
+  parseList,
+  parseDictionary,
+
+  serializeItem,
+  serializeList,
+  serializeDictionary,
+
+  ParseError,
+} = require('../dist');
 const { Token, ByteSequence } = require('../dist');
 const base32Encode = require('base32-encode');
 const base32Decode = require('base32-decode');
@@ -100,13 +109,13 @@ function makeParseTest(test) {
     try {
       switch(test.header_type) {
         case 'item' :
-          result = parser.parseItem(input);
+          result = parseItem(input);
           break;
         case 'list' :
-          result = parser.parseList(input);
+          result = parseList(input);
           break;
         case 'dictionary' :
-          result = parser.parseDictionary(input);
+          result = parseDictionary(input);
           break;
         default:
           throw new Error('Unsupported header type: ' + test.header_type);
@@ -118,7 +127,15 @@ function makeParseTest(test) {
 
     if (test.must_fail) {
       expect(hadError).to.equal(true, 'Parsing this should result in a failure');
-      expect(caughtError instanceof ParseError).to.equal(true);
+
+      if (!(caughtError instanceof ParseError)) {
+        console.error('Original error:');
+        console.error(caughtError);
+        throw new Error(
+          `Errors during the parsing phase should be of type "ParseError" We got: "${caughtError.constructor.name}"`,
+          {cause: caughtError}
+        );
+      }
     } else {
 
       if (hadError) {
@@ -200,13 +217,13 @@ function makeSerializeTest(test) {
     try {
       switch(test.header_type) {
         case 'item' :
-          output = serializer.serializeItem(unpackTestValue(input));
+          output = serializeItem(unpackTestValue(input));
           break;
         case 'list' :
-          output = serializer.serializeList(unpackTestValue(input));
+          output = serializeList(unpackTestValue(input));
           break;
         case 'dictionary' :
-          output = serializer.serializeDictionary(unpackDictionary(input));
+          output = serializeDictionary(unpackDictionary(input));
           break;
         default:
           throw new Error('Unsupported header type: ' + test.header_type);

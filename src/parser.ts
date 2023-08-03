@@ -164,6 +164,9 @@ export default class Parser {
   private parseBareItem(): BareItem {
 
     const char = this.lookChar();
+    if (char === undefined) {
+      throw new ParseError(this.pos, 'Unexpected end of string');
+    }
     if (char.match(/^[-0-9]/)) {
       return this.parseIntegerOrDecimal();
     }
@@ -284,7 +287,7 @@ export default class Parser {
       } else if (char === '"') {
         return outputString;
       } else if (!isAscii(char)) {
-        throw new Error('Strings must be in the ASCII range');
+        throw new ParseError(this.pos, 'Strings must be in the ASCII range');
       } else {
         outputString += char;
       }
@@ -305,7 +308,7 @@ export default class Parser {
 
     while(!this.eof()) {
       const char = this.lookChar();
-      if (!/^[:/!#$%&'*+\-.^_`|~A-Za-z0-9]$/.test(char)) {
+      if (char===undefined || !/^[:/!#$%&'*+\-.^_`|~A-Za-z0-9]$/.test(char)) {
         return new Token(outputString);
       }
       outputString += this.getChar();
@@ -352,7 +355,7 @@ export default class Parser {
 
   private parseKey(): string {
 
-    if (!this.lookChar().match(/^[a-z*]/)) {
+    if (!this.lookChar()?.match(/^[a-z*]/)) {
       throw new ParseError(this.pos, 'A key must begin with an asterisk or letter (a-z)');
     }
 
@@ -360,7 +363,7 @@ export default class Parser {
 
     while(!this.eof()) {
       const char = this.lookChar();
-      if (!/^[a-z0-9_\-.*]$/.test(char)) {
+      if (char===undefined || !/^[a-z0-9_\-.*]$/.test(char)) {
         return outputString;
       }
       outputString += this.getChar();
@@ -372,8 +375,10 @@ export default class Parser {
 
   /**
    * Looks at the next character without advancing the cursor.
+   *
+   * Returns undefined if we were at the end of the string.
    */
-  private lookChar():string {
+  private lookChar():string|undefined {
 
     return this.input[this.pos];
 
@@ -436,8 +441,9 @@ export default class Parser {
 }
 
 const isDigitRegex = /^[0-9]$/;
-function isDigit(char: string): boolean {
+function isDigit(char: string|undefined): boolean {
 
+  if (char===undefined) return false;
   return isDigitRegex.test(char);
 
 }
