@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-1.0.1 (????-??-??)
+1.0.1 (2023-08-03)
 ------------------
 
 * This library emitted `TypeError` or a plain `Error` in a few places in the
