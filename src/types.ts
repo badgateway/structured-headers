@@ -31,6 +31,14 @@ export type Parameters = Map<string, BareItem>;
  */
 export type Dictionary = Map<string, Item|InnerList>;
 
+/**
+ * Another representatation of a Dictionary.
+ *
+ * Serialize functions also accept an Object instead of a Map for a
+ * Dictionary. Parse functions will always return the Map however.
+ */
+export type DictionaryObject = Record<string, BareItem|Item|InnerList>;
+
 export class ByteSequence {
 
   base64Value: string;
