@@ -4,6 +4,7 @@ import {
   SerializeError
 } from '../dist/index.js';
 import { expect} from 'chai';
+import { describe, it } from 'node:test';
 
 /**
  * These tests cover cases that aren't covered by the HTTPWG tests.

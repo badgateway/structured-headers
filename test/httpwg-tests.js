@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { describe, it } from 'node:test';
 import {
   parseItem,
   parseList,
@@ -205,12 +206,13 @@ function makeSerializeTest(test) {
     return;
   }
 
-  it(`should serialize: ${test.name}`, function() {
+  it(`should serialize: ${test.name}`, t => {
 
     if (skipped.includes(test.name) || test.name.endsWith('0 decimal')) {
       // Not yet supporting this.
       // see: https://github.com/httpwg/structured-header-tests/issues/9
-      this.skip('Can\'t support this yet');
+      t.skip('Can\'t support this yet');
+      return;
     }
 
     // Since we do the opposite of the httpwg test, expected and input are
