@@ -105,9 +105,8 @@ the second is a `Map` object with parameters.
 The type is roughly:
 
 ```typescript
-
 // The raw value
-type BareItem = number | string | Token | ByteSequence | boolean;
+type BareItem = number | string | Token | ByteSequence | boolean | Date | DisplayString;
 
 // The return type of parseItem
 type Item = [
@@ -206,10 +205,10 @@ serializeList([
 ]);
 
 // Returns a=1, b=?0
-sh.serializeDictionary(new Map([
-  ['a', [1, new Map()]],
-  ['b', [false, new Map()]],
-]));
+sh.serializeDictionary({
+  a: 1,
+  b: false,
+});
 
 // Returns 42
 serializeItem(42);
