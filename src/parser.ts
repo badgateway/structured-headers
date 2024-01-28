@@ -11,6 +11,7 @@ import {
 import { Token } from './token';
 
 import { isAscii } from './util';
+import { DisplayString } from './displaystring';
 
 export function parseDictionary(input: string): Dictionary {
 
@@ -185,6 +186,9 @@ export default class Parser {
     if (char === '@') {
       return this.parseDate();
     }
+    if (char === '%') {
+      return this.parseDisplayString();
+    }
     throw new ParseError(this.pos, 'Unexpected input');
 
   }
@@ -296,6 +300,32 @@ export default class Parser {
 
     }
     throw new ParseError(this.pos, 'Unexpected end of input');
+
+  }
+
+  private parseDisplayString(): DisplayString {
+
+    this.expectChar('%');
+    this.pos++;
+    this.expectChar('"');
+    this.pos++;
+
+    let result = new Uint8Array();
+
+    while (!this.eof()) {
+
+      const char = this.getChar();
+      if (char.charCodeAt(0) <= 0x1F || (char.charCodeAt(0) >= 0x7F && char.charCodeAt(0) <= 0xFF)) {
+        throw new ParseError('Invalid byte found at offset: ' + this.pos);
+      }
+
+      if (char==='%') {
+        const hexChars = this.input.substr(this.pos,2);
+        if (/^[0-9a-f]{2}$/.test(hexChars)) {
+
+    }
+
+    return new DisplayString(result);
 
   }
 

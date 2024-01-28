@@ -11,6 +11,7 @@ import {
 import { Token } from './token';
 
 import { isAscii, isInnerList, isValidKeyStr } from './util';
+import { DisplayString } from './displaystring';
 
 export class SerializeError extends Error {}
 
@@ -80,6 +81,9 @@ export function serializeBareItem(input: BareItem): string {
   if (input instanceof ByteSequence) {
     return serializeByteSequence(input);
   }
+  if (input instanceof DisplayString) {
+    return serializeDisplayString(input);
+  }
   if (input instanceof Date) {
     return serializeDate(input);
   }
@@ -112,6 +116,10 @@ export function serializeString(input: string): string {
     throw new SerializeError('Only ASCII strings may be serialized');
   }
   return `"${input.replace(/("|\\)/g, (v) => '\\' + v)}"`;
+}
+
+export function serializeDisplayString(input: DisplayString): string {
+  return '%' + serializeString(input.toString());
 }
 
 export function serializeBoolean(input: boolean): string {
