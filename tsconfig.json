@@ -1,8 +1,7 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "target": "es2019",
-
+        "module": "esnext",
+        "target": "es2020",
         "strict": true,
         "noFallthroughCasesInSwitch": true,
         "experimentalDecorators": true,

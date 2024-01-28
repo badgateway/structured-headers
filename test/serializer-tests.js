@@ -1,5 +1,9 @@
-const { serializeDictionary, serializeItem, SerializeError } = require("../dist");
-const expect = require('chai').expect;
+import {
+  serializeDictionary,
+  serializeItem,
+  SerializeError
+} from '../dist/index.js';
+import { expect} from 'chai';
 
 /**
  * These tests cover cases that aren't covered by the HTTPWG tests.

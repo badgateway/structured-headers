@@ -1,5 +1,5 @@
-const expect = require('chai').expect;
-const {
+import { expect } from 'chai';
+import {
   parseItem,
   parseList,
   parseDictionary,
@@ -9,11 +9,18 @@ const {
   serializeDictionary,
 
   ParseError,
-} = require('../dist');
-const { Token, ByteSequence, DisplayString } = require('../dist');
-const base32Encode = require('base32-encode');
-const base32Decode = require('base32-decode');
-const fs = require('fs');
+
+  Token,
+  ByteSequence,
+  DisplayString,
+
+} from '../dist/index.js';
+
+import base32Encode from 'base32-encode';
+import base32Decode from 'base32-decode';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 describe('HTTP-WG tests', () => {
 
@@ -62,8 +69,12 @@ describe('HTTP-WG tests', () => {
 
 function makeTestGroup(testGroup) {
 
-  const fileName = testGroup + '.json';
-  const blob = fs.readFileSync(__dirname + '/httpwg-tests/' + fileName);
+  const testFile = path.join(
+    fileURLToPath(import.meta.url),
+    '../httpwg-tests',
+    testGroup + '.json',
+  );
+  const blob = fs.readFileSync(testFile);
   const tests = JSON.parse(blob);
 
   describe('Parsing', () => {
