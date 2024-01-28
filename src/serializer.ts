@@ -7,12 +7,12 @@ import {
   Item,
   List,
   Parameters,
-} from './types';
+} from './types.js';
 
-import { Token } from './token';
+import { Token } from './token.js';
 
-import { isAscii, isInnerList, isValidKeyStr } from './util';
-import { DisplayString } from './displaystring';
+import { isAscii, isInnerList, isValidKeyStr } from './util.js';
+import { DisplayString } from './displaystring.js';
 
 export class SerializeError extends Error {}
 

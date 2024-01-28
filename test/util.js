@@ -1,7 +1,5 @@
-import { parseItem } from "../dist";
-
-const expect = require('chai').expect;
-const { isByteSequence } = require('../dist');
+import { parseItem, isByteSequence } from "../dist/index.js";
+import { expect } from 'chai';
 
 describe('.isByteSequence', () => {
 
@@ -22,7 +20,7 @@ describe('.isByteSequence', () => {
     })
 
     it('returns false for a JS object', () => {
-        expect(isByteSequence({})).to.be.false
+        expect(isByteSequence(/** @type {any} */({}))).to.be.false
     })
 
 });

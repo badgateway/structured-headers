@@ -1,6 +1,6 @@
-export * from './serializer';
-export * from './parser';
-export * from './types';
-export * from './util';
-export { Token } from './token';
-export { DisplayString } from './displaystring';
+export * from './serializer.js';
+export * from './parser.js';
+export * from './types.js';
+export * from './util.js';
+export { Token } from './token.js';
+export { DisplayString } from './displaystring.js';

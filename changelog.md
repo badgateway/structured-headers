@@ -10,6 +10,10 @@ ChangeLog
   work, but the new API is a bit more natural and doesn\'t require wrapping
   everything in arrays and Maps.
 * Now requires Node 18.
+* Converted to ESM.
+* No longer providing a Webpack build. Most frontend applications already do
+  their own bundling. Please let us know if you need this, so we can do
+  something with modern tools.
 
 
 1.0.1 (2023-08-03)

@@ -6,12 +6,12 @@ import {
   Parameters,
   InnerList,
   ByteSequence
-} from './types';
+} from './types.js';
 
-import { Token } from './token';
+import { Token } from './token.js';
 
-import { isAscii } from './util';
-import { DisplayString } from './displaystring';
+import { isAscii } from './util.js';
+import { DisplayString } from './displaystring.js';
 
 export function parseDictionary(input: string): Dictionary {
 

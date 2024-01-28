@@ -1,4 +1,4 @@
-import { isValidTokenStr } from './util';
+import { isValidTokenStr } from './util.js';
 
 export class Token {
 
