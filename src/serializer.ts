@@ -119,7 +119,21 @@ export function serializeString(input: string): string {
 }
 
 export function serializeDisplayString(input: DisplayString): string {
-  return '%' + serializeString(input.toString());
+  let out = '%"';
+  const textEncoder = new TextEncoder();
+  for (const char of textEncoder.encode(input.toString())) {
+    if (
+      char === 0x25 // %
+      || char === 0x22 // "
+      || char <= 0x1f
+      || char >= 0x7f
+    ) {
+      out += '%' + char.toString(16);
+    } else {
+      out += String.fromCharCode(char);
+    }
+  }
+  return out + '"';
 }
 
 export function serializeBoolean(input: boolean): string {

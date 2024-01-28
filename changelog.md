@@ -5,6 +5,7 @@ ChangeLog
 ------------------
 
 * Support for a new 'Date' type, from draft [draft-ietf-httpbis-sfbis-02][7].
+* Support for the "Display String" type.
 
 
 1.0.1 (2023-08-03)

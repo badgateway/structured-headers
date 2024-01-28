@@ -305,27 +305,44 @@ export default class Parser {
 
   private parseDisplayString(): DisplayString {
 
-    this.expectChar('%');
-    this.pos++;
-    this.expectChar('"');
-    this.pos++;
+    const chars = this.getChars(2);
+    if (chars !== '%"') {
+      throw new ParseError(this.pos, 'Unexpected character. Display strings should start with %=');
+    }
 
-    let result = new Uint8Array();
+    const result:number[] = [];
 
     while (!this.eof()) {
 
       const char = this.getChar();
       if (char.charCodeAt(0) <= 0x1F || (char.charCodeAt(0) >= 0x7F && char.charCodeAt(0) <= 0xFF)) {
-        throw new ParseError('Invalid byte found at offset: ' + this.pos);
+        throw new ParseError(this.pos, 'Invalid char found in DisplayString. Did you forget to escape?');
       }
 
       if (char==='%') {
-        const hexChars = this.input.substr(this.pos,2);
+        const hexChars = this.getChars(2);
         if (/^[0-9a-f]{2}$/.test(hexChars)) {
-
+          result.push(parseInt(hexChars, 16));
+        } else {
+          throw new ParseError(this.pos, `Unexpected sequence after % in DispalyString: "${hexChars}". Note that hexidecimals must be lowercase`);
+        }
+        continue;
+      }
+      if (char==='"') {
+        const textDecoder = new TextDecoder('utf-8', {
+          fatal: true
+        });
+        try {
+        return new DisplayString(
+          textDecoder.decode(new Uint8Array(result))
+       );
+        } catch (err) {
+          throw new ParseError(this.pos, 'Fatal error decoding UTF-8 sequence in Display String');
+        }
+      }
+      result.push(char.charCodeAt(0));
     }
-
-    return new DisplayString(result);
+    throw new ParseError(this.pos, 'Unexpected end of input');
 
   }
 
@@ -458,6 +475,16 @@ export default class Parser {
   private getChar(): string {
 
     return this.input[this.pos++];
+
+  }
+  private getChars(count: number): string {
+
+    const result = this.input.substr(
+      this.pos,
+      count
+    );
+    this.pos += count;
+    return result;
 
   }
   private eof():boolean {
