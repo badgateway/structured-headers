@@ -1,4 +1,5 @@
 import { Token } from './token';
+import { DisplayString } from './displaystring';
 
 /**
  * Lists are arrays of zero or more members, each of which can be an Item
@@ -47,6 +48,6 @@ export class ByteSequence {
 
 }
 
-export type BareItem = number | string | Token | ByteSequence | Date | boolean;
+export type BareItem = number | string | Token | ByteSequence | Date | boolean | DisplayString;
 
 export type Item = [BareItem, Parameters];

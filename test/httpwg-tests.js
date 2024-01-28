@@ -10,7 +10,7 @@ const {
 
   ParseError,
 } = require('../dist');
-const { Token, ByteSequence } = require('../dist');
+const { Token, ByteSequence, DisplayString } = require('../dist');
 const base32Encode = require('base32-encode');
 const base32Decode = require('base32-decode');
 const fs = require('fs');
@@ -24,6 +24,7 @@ describe('HTTP-WG tests', () => {
     'string',
     'token',
     'date',
+    'display-string',
 
     'item',
 
@@ -284,6 +285,12 @@ function packTestValue(input) {
       value: input.toString()
     }
   }
+  if(input instanceof DisplayString) {
+    return {
+      __type: 'displaystring',
+      value: input.toString()
+    }
+  }
   if (input instanceof ByteSequence) {
     return {
       __type: 'binary',
@@ -340,6 +347,8 @@ function unpackTestValue(input) {
         return new ByteSequence(Buffer.from(base32Decode(input.value, 'RFC4648')).toString('base64'));
       case 'date' :
         return new Date(input.value * 1000);
+      case 'displaystring' :
+        return new DisplayString(input.value);
       default:
         throw new Error('Unknown input __type: ' + input.__type);
     }
