@@ -9,11 +9,11 @@ clean:
 
 .PHONY: test
 test: lint test/httpwg-tests/list.json dist/build
-	node_modules/.bin/nyc node_modules/.bin/mocha
+	node --test --experimental-test-coverage
 
 .PHONY: test-debug
 test-debug:
-	node_modules/.bin/mocha --inspect-brk
+	node --test --experimental-test-coverage --inspect-brk
 
 .PHONY: lint
 lint:

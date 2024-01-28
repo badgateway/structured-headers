@@ -1,5 +1,6 @@
 import { parseItem, isByteSequence } from "../dist/index.js";
 import { expect } from 'chai';
+import { describe, it } from 'node:test';
 
 describe('.isByteSequence', () => {
 
