@@ -6,6 +6,9 @@ ChangeLog
 
 * Support for a new 'Date' type, from draft [draft-ietf-httpbis-sfbis-02][7].
 * Support for the "Display String" type.
+* Simplified serializing Dictionaries and Items. The existing signatures still
+  work, but the new API is a bit more natural and doesn\'t require wrapping
+  everything in arrays and Maps.
 * Now requires Node 18.
 
 
