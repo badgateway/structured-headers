@@ -199,7 +199,6 @@ import {
   serializeItem
 } from 'structured-headers';
 
-
 // Returns "foo", "bar"
 serializeList([
   ['foo', new Map()],
@@ -213,25 +212,32 @@ sh.serializeDictionary(new Map([
 ]));
 
 // Returns 42
-serializeItem([42, new Map()]);
+serializeItem(42);
 
 // Returns 5.5
-serializeItem([5.5, new Map()]);
+serializeItem(5.5);
 
 // Returns "hello world"
-serializeItem(["hello world", new Map()]);
+serializeItem("hello world");
 
 // Returns %"Frysl%C3%A2n"
-serializeItem(["Fryslân", new Map()]);
+serializeItem("Fryslân");
 
 // Returns ?1
-serializeItem([true, new Map()]);
+serializeItem(true);
 
 // Returns a base-64 representation like: *aGVsbG8=*
-serializeItem([new ByteSequence('aGVsbG8='), new Map()]);
+serializeItem(new ByteSequence('aGVsbG8='));
 
 // Returns a unix timestamp
-serializeItem([new Date(), new Map()]);
+serializeItem(new Date());
+
+// Parameters to items can be passed as the second argument
+// Returns "hello", q=5
+serializeItem(
+  "hello",
+  new Map(['q', 5])
+);
 ```
 
 Browser support

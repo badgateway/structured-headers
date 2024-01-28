@@ -52,9 +52,23 @@ export function serializeDictionary(input: Dictionary): string {
 
 }
 
-export function serializeItem(input: Item): string {
+/**
+ * Serialize a Structured Fields Item.
+ *
+ * An Item is a standalone value like a string, number of date, followed by
+ * an optional set of parameters.
+ *
+ * You can either pass the value in the first argument and parameters in the second, or pass both as a tuple. The later exists for symmetry with parseItem.
+ */
+export function serializeItem(input: Item): string;
+export function serializeItem(input: BareItem, params?: Parameters): string; 
+export function serializeItem(input: Item|BareItem, params?: Parameters): string {
 
-  return serializeBareItem(input[0]) + serializeParameters(input[1]);
+  if (Array.isArray(input)) {
+    return serializeBareItem(input[0]) + serializeParameters(input[1]);
+  } else {
+    return serializeBareItem(input) + (params?serializeParameters(params):'');
+  }
 
 }
 
