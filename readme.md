@@ -59,11 +59,16 @@ The following are examples of `item` headers:
 Parsed as string
 
 ```
-# Parsed as string
+# Parsed an ASCII string
 Header: "foo"
 
 # A simple string, called a 'Token' in the spec
 Header: foo
+
+# A Unicode string, called a 'Display String' in the spec. They use
+# percent encoding, but encode a different set of characters than
+# URLs.
+Header %"Frysl%C3%A2n"
 
 # Parsed as number
 Header: 5
@@ -83,7 +88,6 @@ Header: "Hello world"; a="5"
 # Parsed into a Date object
 Header: @1686634251
 ```
-
 
 To parse these header values, use the `parseItem`:
 
@@ -216,6 +220,9 @@ serializeItem([5.5, new Map()]);
 
 // Returns "hello world"
 serializeItem(["hello world", new Map()]);
+
+// Returns %"Frysl%C3%A2n"
+serializeItem(["Fryslân", new Map()]);
 
 // Returns ?1
 serializeItem([true, new Map()]);
