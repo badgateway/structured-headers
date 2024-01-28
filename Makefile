@@ -1,5 +1,8 @@
 SOURCE_FILES:=$(shell find src/ -type f -name '*.ts')
 
+.PHONY: build
+build: dist/build
+
 .PHONY: clean
 clean:
 	rm -r dist/
