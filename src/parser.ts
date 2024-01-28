@@ -333,9 +333,9 @@ export default class Parser {
           fatal: true
         });
         try {
-        return new DisplayString(
-          textDecoder.decode(new Uint8Array(result))
-       );
+          return new DisplayString(
+            textDecoder.decode(new Uint8Array(result))
+          );
         } catch (err) {
           throw new ParseError(this.pos, 'Fatal error decoding UTF-8 sequence in Display String');
         }
