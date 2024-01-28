@@ -20,7 +20,7 @@ describe('.isByteSequence', () => {
     })
 
     it('returns false for a JS object', () => {
-        expect(isByteSequence({} as any)).to.be.false
+        expect(isByteSequence(/** @type {any} */({}))).to.be.false
     })
 
 });
