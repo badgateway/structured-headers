@@ -1,19 +1,19 @@
 ChangeLog
 =========
 
-2.0.0 (????-??-??)
-------------------
+2.0.0-alpha.0 (????-??-??)
+--------------------------
 
-* Support for a new 'Date' type, from draft [draft-ietf-httpbis-sfbis-02][7].
-* Support for the "Display String" type.
+* Support for a new `Date` and `Display String` types, from the new draft
+  [draft-ietf-httpbis-sfbis][7].
 * Simplified serializing Dictionaries and Items. The existing signatures still
-  work, but the new API is a bit more natural and doesn\'t require wrapping
+  work, but the new API is a bit more natural and doesn't require wrapping
   everything in arrays and Maps.
 * Now requires Node 18.
 * Converted to ESM.
 * No longer providing a Webpack build. Most frontend applications already do
-  their own bundling. Please let us know if you need this, so we can do
-  something with modern tools.
+  their own bundling. Please let us know if you need this, so we can redo this
+  with modern tools.
 
 
 1.0.1 (2023-08-03)
@@ -113,4 +113,4 @@ ChangeLog
 [4]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-13
 [5]: https://datatracker.ietf.org/doc/html/rfc8941
 [6]: https://github.com/httpwg/structured-field-tests
-[7]: https://www.ietf.org/archive/id/draft-ietf-httpbis-sfbis-02.html
+[7]: https://www.ietf.org/archive/id/draft-ietf-httpbis-sfbis-05.html
