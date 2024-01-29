@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-2.0.0-alpha.0 (????-??-??)
+2.0.0-alpha.0 (2024-01-29)
 --------------------------
 
 * Support for a new `Date` and `Display String` types, from the new draft
