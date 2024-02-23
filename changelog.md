@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-2.0.0-alpha.1 (????-??-??)
+2.0.0-alpha.1 (2024-02-23)
 --------------------------
 
 * Fixed `exports` value in `package.json`. (@CxRes)
