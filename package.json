@@ -3,7 +3,7 @@
   "version": "2.0.0-alpha.0",
   "description": "Implementation of RFC8941, structured headers for HTTP.",
   "type": "module",
-  "exports": "dist/index.js",
+  "exports": "./dist/index.js",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
   "scripts": {
