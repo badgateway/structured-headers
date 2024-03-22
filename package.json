@@ -31,8 +31,6 @@
   "files": [
     "src/",
     "dist/",
-    "browser/structured-header.min.js",
-    "browser/structured-header.min.js.map",
     "LICENSE"
   ],
   "homepage": "https://github.com/evert/structured-header#readme",
