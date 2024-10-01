@@ -9,11 +9,11 @@ clean:
 
 .PHONY: test
 test: lint test/httpwg-tests/list.json dist/build
-	node --test --experimental-test-coverage
+	node --test
 
 .PHONY: test-debug
 test-debug:
-	node --test --experimental-test-coverage --inspect-brk
+	node --test --inspect-brk
 
 .PHONY: lint
 lint:
