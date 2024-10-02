@@ -336,7 +336,7 @@ export default class Parser {
           return new DisplayString(
             textDecoder.decode(new Uint8Array(result))
           );
-        } catch (err) {
+        } catch {
           throw new ParseError(this.pos, 'Fatal error decoding UTF-8 sequence in Display String');
         }
       }
