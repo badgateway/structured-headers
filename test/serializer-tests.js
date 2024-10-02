@@ -3,8 +3,8 @@ import {
   serializeItem,
   SerializeError
 } from '../dist/index.js';
-import { expect} from 'chai';
 import { describe, it } from 'node:test';
+import assert from 'node:assert';
 
 /**
  * These tests cover cases that aren't covered by the HTTPWG tests.
@@ -23,7 +23,8 @@ describe('serializer shorthands', () => {
       };
 
       const str = serializeDictionary(simpleDict);
-      expect(str).to.equal(
+      assert.equal(
+        str,
         'a=1, b, c="d", f=(1 2 3);a="b"'
       );
 
@@ -45,7 +46,7 @@ describe('serializer shorthands', () => {
           throw err;
         }
       }
-      expect(caught).to.be.true;
+      assert.ok(caught);
 
     });
 

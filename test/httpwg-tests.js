@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import { describe, it } from 'node:test';
 import {
   parseItem,
@@ -21,6 +20,7 @@ import base32Decode from 'base32-decode';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import assert from 'node:assert';
 
 describe('HTTP-WG tests', () => {
 
@@ -139,7 +139,7 @@ function makeParseTest(test) {
     }
 
     if (test.must_fail) {
-      expect(hadError).to.equal(true, 'Parsing this should result in a failure');
+      assert.ok(hadError, 'Parsing this should result in a failure');
 
       if (!(caughtError instanceof ParseError)) {
         console.error('Original error:');
@@ -154,7 +154,7 @@ function makeParseTest(test) {
       if (hadError) {
 
         if (test.can_fail) {
-          expect(caughtError instanceof ParseError).to.equal(true);
+          assert.ok(caughtError instanceof ParseError);
         } else {
           // Failure is NOT OK
           throw new Error('We should not have failed but got an error: ' + caughtError.message);
@@ -164,7 +164,7 @@ function makeParseTest(test) {
       result = packTestValue(result);
 
       try {
-        expect(result).to.deep.equal(expected);
+        assert.deepStrictEqual(result, expected);
       } catch (e) {
         if (test.can_fail) {
           // Optional failure
@@ -248,7 +248,7 @@ function makeSerializeTest(test) {
     }
 
     if (test.must_fail) {
-      expect(hadError).to.equal(true, 'Parsing this should result in a failure');
+      assert.ok(hadError, 'Parsing this should result in a failure');
     } else {
 
       if (hadError) {
@@ -256,7 +256,7 @@ function makeSerializeTest(test) {
         if (test.can_fail) {
 
           // Failure is OK
-          expect(hadError).to.equal(true);
+          assert.ok(hadError);
         } else {
           // Failure is NOT OK
           throw new Error('We should not have failed but got an error: ' + caughtError.message);
@@ -264,7 +264,7 @@ function makeSerializeTest(test) {
       }
 
       try {
-        expect(output).to.deep.equal(expected);
+        assert.strictEqual(output, expected);
       } catch (e) {
 
         if (test.can_fail) {
