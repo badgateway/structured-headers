@@ -36,8 +36,8 @@ export function arrayBufferToBase64(ab: ArrayBuffer): string {
   let binary = '';
 
   // Convert each byte to a character
-  for (let i = 0; i < bytes.length; i++) {
-      binary += String.fromCharCode(bytes[i]);
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
   }
 
   // Encode the binary string as Base64
@@ -55,7 +55,7 @@ export function base64ToArrayBuffer(b64: string): ArrayBuffer {
 
   // Convert each character to its corresponding byte
   for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
+    bytes[i] = binaryString.charCodeAt(i);
   }
 
   // Return the ArrayBuffer
