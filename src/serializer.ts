@@ -1,6 +1,5 @@
 import {
   BareItem,
-  ByteSequence,
   Dictionary,
   DictionaryObject,
   InnerList,
@@ -11,7 +10,7 @@ import {
 
 import { Token } from './token.js';
 
-import { isAscii, isInnerList, isValidKeyStr } from './util.js';
+import { isAscii, isInnerList, isValidKeyStr, arrayBufferToBase64 } from './util.js';
 import { DisplayString } from './displaystring.js';
 
 export class SerializeError extends Error {}
@@ -100,7 +99,7 @@ export function serializeBareItem(input: BareItem): string {
   if (input instanceof Token) {
     return serializeToken(input);
   }
-  if (input instanceof ByteSequence) {
+  if (input instanceof ArrayBuffer) {
     return serializeByteSequence(input);
   }
   if (input instanceof DisplayString) {
@@ -162,8 +161,8 @@ export function serializeBoolean(input: boolean): string {
   return input ? '?1' : '?0';
 }
 
-export function serializeByteSequence(input: ByteSequence): string {
-  return `:${input.toBase64()}:`;
+export function serializeByteSequence(input: ArrayBuffer): string {
+  return `:${arrayBufferToBase64(input)}:`;
 }
 
 export function serializeToken(input: Token): string {

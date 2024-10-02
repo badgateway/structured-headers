@@ -5,12 +5,11 @@ import {
   BareItem,
   Parameters,
   InnerList,
-  ByteSequence
 } from './types.js';
 
 import { Token } from './token.js';
 
-import { isAscii } from './util.js';
+import { isAscii, base64ToArrayBuffer } from './util.js';
 import { DisplayString } from './displaystring.js';
 
 export function parseDictionary(input: string): Dictionary {
@@ -367,7 +366,7 @@ export default class Parser {
 
   }
 
-  private parseByteSequence(): ByteSequence {
+  private parseByteSequence(): ArrayBuffer {
 
     this.expectChar(':');
     this.pos++;
@@ -382,7 +381,7 @@ export default class Parser {
       throw new ParseError(this.pos, 'ByteSequence does not contain a valid base64 string');
     }
 
-    return new ByteSequence(b64Content);
+    return base64ToArrayBuffer(b64Content);
 
   }
 

@@ -12,7 +12,6 @@ import {
   ParseError,
 
   Token,
-  ByteSequence,
   DisplayString,
 
 } from '../dist/index.js';
@@ -304,10 +303,10 @@ function packTestValue(input) {
       value: input.toString()
     }
   }
-  if (input instanceof ByteSequence) {
+  if (input instanceof ArrayBuffer) {
     return {
       __type: 'binary',
-      value: base32Encode(Buffer.from(input.toBase64(), 'base64'), 'RFC4648')
+      value: base32Encode(input, 'RFC4648')
     }
   }
   if (input instanceof Date) {
@@ -357,7 +356,7 @@ function unpackTestValue(input) {
       case 'token' :
         return new Token(input.value);
       case 'binary':
-        return new ByteSequence(Buffer.from(base32Decode(input.value, 'RFC4648')).toString('base64'));
+        return new base32Decode(input.value, 'RFC4648');
       case 'date' :
         return new Date(input.value * 1000);
       case 'displaystring' :
