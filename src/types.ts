@@ -39,23 +39,6 @@ export type Dictionary = Map<string, Item|InnerList>;
  */
 export type DictionaryObject = Record<string, BareItem|Item|InnerList>;
 
-export class ByteSequence {
-
-  base64Value: string;
-  constructor(base64Value: string) {
-
-    this.base64Value = base64Value;
-
-  }
-
-  toBase64(): string {
-
-    return this.base64Value;
-
-  }
-
-}
-
-export type BareItem = number | string | Token | ByteSequence | Date | boolean | DisplayString;
+export type BareItem = number | string | Token | ArrayBuffer | Date | boolean | DisplayString;
 
 export type Item = [BareItem, Parameters];

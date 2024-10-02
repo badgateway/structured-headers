@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+2.0.0 (????-??-??)
+------------------
+
+* #66: We now convert from/to ArrayBuffer instead of a custom ByteSequence
+  object. This is a breaking change.
+
+
 2.0.0-alpha.1 (2024-02-23)
 --------------------------
 
