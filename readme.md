@@ -15,7 +15,7 @@ CommonJS builds and has 0 dependencies.
 Compatibility
 -------------
 
-This package has 2740 unittests, the vast majority are supplied from the
+This package has 2805 unittests, the vast majority are supplied from the
 official [HTTP WG test suite][2].
 
 However, there are 2 differences in the serializer:
