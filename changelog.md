@@ -1,12 +1,23 @@
 ChangeLog
 =========
 
-2.0.0 (????-??-??)
+2.0.0 (2024-10-02)
 ------------------
 
-* #66: We now convert from/to ArrayBuffer instead of a custom ByteSequence
+The "Structured Field Values" was updated in [RFC9651][rfc9651]. This new
+specification added the ['Date'][9] and ['Display String'][10] field types.
+The former encodes unix timestamp, the latter a Unicode string.
+
+Perfect time to update this package as well! This new major release supports
+the new standard.
+
+* #66: We now convert from/to `ArrayBuffer` instead of a custom ByteSequence
   object. This is a breaking change.
-* Bundling CommonJS for backwards compat.
+* Add support for `Date` and `DisplayString` from RFC9651.
+* Switched to ESM, but we're still bundling a CommonJS build.
+* No longer shipping a minified build.
+* Dropped Chai and now using `node:assert`.
+* Dropped Mocha and now using `node:test`.
 
 
 2.0.0-alpha.1 (2024-02-23)
@@ -63,7 +74,7 @@ ChangeLog
 0.4.0 (2021-05-15)
 ------------------
 
-* Fully up to date with [RFC8941][5].
+* Fully up to date with [RFC8941][rfc8941].
 * This is a complete rewrite, all APIs have changed and return the structures
   that are recommended by the actual RFC document.
 * Passing almost all tests from the [HTTP WG test suite][6]. See the readme for
@@ -125,6 +136,9 @@ ChangeLog
 [2]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-09
 [3]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-10
 [4]: https://tools.ietf.org/html/draft-ietf-httpbis-header-structure-13
-[5]: https://datatracker.ietf.org/doc/html/rfc8941
 [6]: https://github.com/httpwg/structured-field-tests
 [7]: https://www.ietf.org/archive/id/draft-ietf-httpbis-sfbis-05.html
+[9]: https://www.rfc-editor.org/rfc/rfc9651.html#name-dates
+[10]: https://www.rfc-editor.org/rfc/rfc9651.html#name-display-strings
+[rfc8941]: https://datatracker.ietf.org/doc/html/rfc8941
+[rfc9651]: https://datatracker.ietf.org/doc/html/rfc9651

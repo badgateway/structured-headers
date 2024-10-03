@@ -1,7 +1,7 @@
 {
   "name": "structured-headers",
   "version": "2.0.0-alpha.1",
-  "description": "Implementation of RFC8941, structured headers for HTTP.",
+  "description": "Implementation of Structured Field Values for HTTP (RFC9651, RFC8941)",
   "type": "module",
   "exports": {
     "import": "./dist/index.js",
@@ -22,6 +22,7 @@
     "structured-header",
     "structured-fields",
     "structured fields",
+    "RFC9651",
     "RFC8941",
     "headers"
   ],
