@@ -107,7 +107,7 @@ The type is roughly:
 
 ```typescript
 // The raw value
-type BareItem = number | string | Token | ByteSequence | boolean | Date | DisplayString;
+type BareItem = number | string | Token | ArrayBuffer | boolean | Date | DisplayString;
 
 // The return type of parseItem
 type Item = [
@@ -214,6 +214,13 @@ sh.serializeDictionary({
 // Returns 42
 serializeItem(42);
 
+48,65,6C,6C,6F,2C,20,57,6F,72,6C,64,21.
+
+72, 101, 108, 108,
+  111,  32, 119, 111,
+  114, 108, 100
+
+
 // Returns 5.5
 serializeItem(5.5);
 
@@ -227,7 +234,11 @@ serializeItem("Fryslân");
 serializeItem(true);
 
 // Returns a base-64 representation like: *aGVsbG8=*
-serializeItem(new ByteSequence('aGVsbG8='));
+serializeItem(
+    new UInt8Array(
+        [72, 101, 108, 108, 111,  32, 119, 111, 114, 108, 100]
+    ).buffer
+);
 
 // Returns a unix timestamp
 serializeItem(new Date());
