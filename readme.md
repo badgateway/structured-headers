@@ -1,15 +1,16 @@
 Structured Headers parser for Javascript
 ========================================
 
-This library is a parser and serializer for the [Structured Headers][1]
-specification, a.k.a. "Structured Field Values for HTTP" (RFC8941).
+This library implements a parser and serializer for the [Structured Field Values for HTTP][2]
+specification. ([RFC9651][3], [RFC8941][1]).
 
 This specification defines a standard serialization for complex HTTP header
 values, including lists (arrays), dictionaries (maps) and also numbers,
-booleans, and binary data.
+booleans, binary data, timestamps and Unicode strings.
 
 The library is written in Typescript, and the examples in this document are
-too, but plain Javascript is also fully supported.
+too, but plain Javascript is also fully supported. It ships with ESM and
+CommonJS builds and has 0 dependencies.
 
 Compatibility
 -------------
@@ -249,3 +250,4 @@ of the api.
 
 [1]: https://datatracker.ietf.org/doc/html/rfc8941
 [2]: https://github.com/httpwg/structured-field-tests
+[3]: https://www.rfc-editor.org/rfc/rfc9651.html
