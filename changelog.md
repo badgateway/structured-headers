@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-2.0.0 (????-??-??)
+2.0.0 (2024-10-02)
 ------------------
 
 The "Structured Field Values" was updated in [RFC9651][rfc9651]. This new
