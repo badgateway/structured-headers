@@ -381,7 +381,11 @@ export default class Parser {
       throw new ParseError(this.pos, 'ByteSequence does not contain a valid base64 string');
     }
 
-    return base64ToArrayBuffer(b64Content);
+    try {
+      return base64ToArrayBuffer(b64Content);
+    } catch {
+      throw new ParseError(this.pos, 'ByteSequence does not contain a valid base64 string');
+    }
 
   }
 
