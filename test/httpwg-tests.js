@@ -269,7 +269,7 @@ function makeSerializeTest(test) {
 
         if (test.can_fail) {
           // Optional failure
-          this.skip('can_fail was true');
+          t.skip('can_fail was true');
         } else {
           throw e;
         }
