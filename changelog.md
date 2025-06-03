@@ -1,15 +1,21 @@
 ChangeLog
 =========
 
+2.0.1 (2025-06-03)
+------------------
+
+* Update dependencies, including some dev depenendencies with security issues.
+  (@apasel422)
+* Fixed a few tests. (@apasel422)
+
+
 2.0.0 (2024-10-02)
 ------------------
 
 The "Structured Field Values" was updated in [RFC9651][rfc9651]. This new
-specification added the ['Date'][9] and ['Display String'][10] field types.
-The former encodes unix timestamp, the latter a Unicode string.
-
-Perfect time to update this package as well! This new major release supports
-the new standard.
+specification added the ['Date'][9] and ['Display String'][10] field types. The
+former encodes unix timestamp, the latter a Unicode string. Perfect time to
+update this package as well! This new major release supports the new standard.
 
 * #66: We now convert from/to `ArrayBuffer` instead of a custom ByteSequence
   object. This is a breaking change.
