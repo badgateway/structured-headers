@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-2.0.1 (????-??-??)
+2.0.1 (2025-06-03)
 ------------------
 
 * Update dependencies, including some dev depenendencies with security issues.
