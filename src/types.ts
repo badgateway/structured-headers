@@ -1,5 +1,5 @@
-import { Token } from './token';
-import { DisplayString } from './displaystring';
+import { Token } from './token.js';
+import { DisplayString } from './displaystring.js';
 
 /**
  * Lists are arrays of zero or more members, each of which can be an Item
