@@ -1,4 +1,4 @@
-import { Item, InnerList } from './types';
+import { Item, InnerList } from './types.js';
 
 const asciiRe = /^[\x20-\x7E]*$/;
 const tokenRe = /^[a-zA-Z*][:/!#$%&'*+\-.^_`|~A-Za-z0-9]*$/;
