@@ -1,6 +1,12 @@
 ChangeLog
 =========
 
+2.0.2 (????-??-??)
+------------------
+
+* Use file extensions even when importing type-only files. (@mxxk).
+
+
 2.0.1 (2025-06-03)
 ------------------
 
